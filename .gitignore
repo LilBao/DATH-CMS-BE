@@ -1,8 +1,35 @@
+# Build output
 target/
 *.class
 *.jar
 *.war
+
+# IDE files
 .idea/
 *.iml
-.env
+.vscode/
+*.swp
+
+# Logs
 *.log
+logs/
+spring.log
+
+# Environment & secrets
+.env
+*.env
+application-*.yml
+application-*.properties
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup & temp
+*.bak
+*.tmp
+*.pid
+
+# Test reports
+test-output/
+surefire-reports/
