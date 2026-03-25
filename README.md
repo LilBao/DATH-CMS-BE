@@ -1,7 +1,7 @@
-# CGV Cinema Backend
+# cms Cinema Backend
 
 ## Stack
-- Java 17 + Spring Boot 3.4.3
+- Java 17 + Spring Boot 4.0.4
 - MySQL 8.0
 - Redis 7.2
 - JWT (JJWT 0.12.6)

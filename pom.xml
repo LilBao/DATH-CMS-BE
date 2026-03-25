@@ -12,17 +12,18 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.cgv</groupId>
+    <groupId>com.cms</groupId>
     <artifactId>cms-backend</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>CGV Cinema Backend</name>
-    <description>CGV Cinema Management System - Backend API</description>
+    <name>cms Cinema Backend</name>
+    <description>cms Cinema Management System - Backend API</description>
     <packaging>jar</packaging>
 
     <properties>
         <java.version>17</java.version>
         <jjwt.version>0.12.6</jjwt.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <dependencies>
@@ -88,7 +89,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- MapStruct -->
@@ -135,14 +137,24 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
                         </path>
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
-                        </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-wrapper-plugin</artifactId>
+                <version>3.3.2</version>
             </plugin>
         </plugins>
     </build>

@@ -1,11 +1,11 @@
 spring:
   application:
-    name: cgv-backend
+    name: cms-backend
 
   datasource:
-    url: jdbc:mysql://localhost:3306/cgv?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh&characterEncoding=UTF-8
-    username: cgv_user
-    password: cgv_password
+    url: jdbc:mysql://localhost:3306/cms?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh&characterEncoding=UTF-8
+    username: cms_user
+    password: cms_password
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 20
@@ -14,13 +14,28 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         use_sql_comments: true
     open-in-view: false
@@ -62,7 +77,7 @@ app:
     secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     expiration-ms: 86400000          # 24 hours
     refresh-expiration-ms: 604800000 # 7 days
-    issuer: cgv-cinema
+    issuer: cms-cinema
   cors:
     allowed-origins: "http://localhost:3000,http://localhost:5173"
   oauth2:
@@ -77,6 +92,6 @@ server:
 
 logging:
   level:
-    com.cgv: DEBUG
+    com.cms: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
