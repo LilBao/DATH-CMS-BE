@@ -24,6 +24,7 @@ http://localhost:8080/api
 | POST   | /auth/logout   | Đăng xuất             |
 | GET    | /auth/me       | Thông tin user        |
 
+Sử dụng @CurrentUser truyền vào param method của API để lấy user hiện tại
 ## Login Examples
 
 ### Local Login
