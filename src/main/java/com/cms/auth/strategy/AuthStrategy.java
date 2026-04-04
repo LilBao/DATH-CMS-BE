@@ -1,4 +1,4 @@
-package com.cms.auth.factory;
+package com.cms.auth.strategy;
 
 import com.cms.auth.dto.LoginRequest;
 import com.cms.auth.dto.JwtResponse;
@@ -6,20 +6,20 @@ import com.cms.common.enums.AuthProviderType;
 
 /**
  * ============================================================
- * DESIGN PATTERN: FACTORY METHOD
+ * DESIGN PATTERN: STRATEGY
  * ============================================================
- * Interface AuthProvider định nghĩa contract cho tất cả
+ * Interface AuthStrategy định nghĩa contract cho tất cả
  * các strategy xác thực (Local, Google, Facebook...).
  *
  * Các implementation:
- *   - LocalAuthProvider  → email/password thông thường
- *   - GoogleAuthProvider → OAuth2 Google
+ *   - LocalAuthStrategy  → email/password thông thường
+ *   - GoogleAuthStrategy → OAuth2 Google
  *
- * AuthProviderFactory sẽ quyết định triển khai nào được dùng
+ * AuthStrategyContext sẽ quyết định triển khai nào được dùng
  * dựa vào AuthProviderType.
  * ============================================================
  */
-public interface AuthProvider {
+public interface AuthStrategy {
 
     /**
      * Loại provider này hỗ trợ

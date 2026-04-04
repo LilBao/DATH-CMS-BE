@@ -5,9 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/**
- * Chuẩn hoá response trả về cho tất cả API
- */
+
 @Data
 @Builder
 @NoArgsConstructor

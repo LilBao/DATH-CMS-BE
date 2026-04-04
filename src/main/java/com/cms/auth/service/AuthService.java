@@ -1,7 +1,7 @@
 package com.cms.auth.service;
 
 import com.cms.auth.dto.*;
-import com.cms.auth.factory.AuthProviderFactory;
+import com.cms.auth.strategy.AuthStrategyContext;
 import com.cms.common.enums.AuthProviderType;
 import com.cms.common.enums.UserType;
 import com.cms.common.exception.AppException;
@@ -23,14 +23,14 @@ import java.util.Map;
 
 /**
  * AuthService - Điều phối các luồng xác thực.
- * Dùng AuthProviderFactory để chọn đúng provider.
+ * Dùng AuthStrategyContext để chọn đúng strategy (Local, Google, Facebook...).
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthProviderFactory authProviderFactory;
+    private final AuthStrategyContext authStrategyContext;
     private final CustomerRepository customerRepository;
     private final MembershipRepository membershipRepository;
     private final PasswordEncoder passwordEncoder;
@@ -45,7 +45,7 @@ public class AuthService {
 
 
     /**
-     * Đăng nhập - delegate đến đúng AuthProvider qua Factory
+     * Đăng nhập - delegate đến đúng AuthStrategy qua Context
      *
      * @param request LoginRequest với provider type
      * @return JwtResponse
@@ -53,7 +53,7 @@ public class AuthService {
     public JwtResponse login(LoginRequest request) {
         AuthProviderType providerType = request.getProviderType();
         log.info("Login attempt with provider: {}", providerType);
-        return authProviderFactory.getProvider(providerType).authenticate(request);
+        return authStrategyContext.getStrategy(providerType).authenticate(request);
     }
 
 

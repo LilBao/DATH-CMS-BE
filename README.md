@@ -5,6 +5,8 @@
 - MySQL 8.0
 - Redis 7.2
 - JWT (JJWT 0.12.6)
+- Elastic Bean Search
+- Cloudinary
 - Docker + Docker Compose
 
 ## Run with Docker
@@ -45,3 +47,6 @@ POST /api/auth/login
   "provider": "GOOGLE"
 }
 ```
+
+Flow backend
+Controller -> Interface -> Service -> Repository

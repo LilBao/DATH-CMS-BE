@@ -1,4 +1,4 @@
-package com.cms.auth.factory;
+package com.cms.auth.strategy;
 
 import com.cms.auth.dto.JwtResponse;
 import com.cms.auth.dto.LoginRequest;
@@ -24,7 +24,7 @@ import java.util.Optional;
 
 /**
  * ============================================================
- * GOOGLE AUTH PROVIDER - Đăng nhập qua Google OAuth2
+ * GOOGLE AUTH STRATEGY - Đăng nhập qua Google OAuth2
  * ============================================================
  * Flow:
  *   1. Frontend lấy Google ID Token (từ Google Sign-In SDK)
@@ -33,13 +33,13 @@ import java.util.Optional;
  *   4. Extract email, name, picture từ Google payload
  *   5. Tạo/cập nhật Customer account → Tạo JWT
  *
- * Implements AuthProvider → tích hợp Factory Pattern
+ * Implements AuthStrategy → tích hợp Strategy Pattern
  * ============================================================
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GoogleAuthProvider implements AuthProvider {
+public class GoogleAuthStrategy implements AuthStrategy {
 
     private static final String GOOGLE_TOKEN_INFO_URL =
             "https://oauth2.googleapis.com/tokeninfo?id_token=";

@@ -11,16 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * Auth REST Controller
- *
- * POST /auth/register    → Đăng ký tài khoản mới
- * POST /auth/login       → Đăng nhập (LOCAL hoặc GOOGLE)
- * POST /auth/refresh     → Làm mới access token
- * POST /auth/logout      → Đăng xuất
- * GET  /auth/me          → Lấy thông tin user hiện tại
- */
+@Tag(name = "Authentication", description = "Các API xác thực, đăng nhập, đăng ký và quản lý phiên của người dùng")
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -33,6 +27,7 @@ public class AuthController {
      * POST /auth/register
      * Đăng ký tài khoản Customer mới bằng email/password
      */
+    @Operation(summary = "Đăng ký tài khoản mới", description = "Tạo một tài khoản Customer mới với email và mật khẩu.")
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<JwtResponse>> register(
             @Valid @RequestBody RegisterRequest request) {
@@ -58,6 +53,7 @@ public class AuthController {
      *   "provider": "GOOGLE"
      * }
      */
+    @Operation(summary = "Đăng nhập", description = "Đăng nhập bằng tài khoản nội bộ (LOCAL) hoặc Google (GOOGLE). Trả về JwtToken.")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<JwtResponse>> login(
             @Valid @RequestBody LoginRequest request) {
@@ -69,6 +65,7 @@ public class AuthController {
      * POST /auth/refresh
      * Body: { "refreshToken": "..." }
      */
+    @Operation(summary = "Làm mới Access Token", description = "Sử dụng Refresh Token hợp lệ để lấy cặp Access Token / Refresh Token mới.")
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<JwtResponse>> refresh(
             @Valid @RequestBody RefreshTokenRequest request) {
@@ -81,6 +78,7 @@ public class AuthController {
      * POST /auth/logout
      * Requires: Authorization: Bearer <token>
      */
+    @Operation(summary = "Đăng xuất", description = "Hủy bỏ token hiện tại và đăng xuất người dùng khỏi hệ thống.")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -102,6 +100,7 @@ public class AuthController {
      * GET /auth/me
      * Lấy thông tin user đang đăng nhập
      */
+    @Operation(summary = "Lấy thông tin tài khoản", description = "Lấy thông tin của người dùng đang đăng nhập hiện tại dựa trên JWT Token.")
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserInfoResponse>> me(
             @AuthenticationPrincipal UserPrincipal currentUser) {

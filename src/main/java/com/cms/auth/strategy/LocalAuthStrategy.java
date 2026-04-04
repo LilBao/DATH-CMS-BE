@@ -1,4 +1,4 @@
-package com.cms.auth.factory;
+package com.cms.auth.strategy;
 
 import com.cms.auth.dto.JwtResponse;
 import com.cms.auth.dto.LoginRequest;
@@ -22,9 +22,9 @@ import java.util.Optional;
 
 /**
  * ============================================================
- * LOCAL AUTH PROVIDER - Đăng nhập bằng Email/Password
+ * LOCAL AUTH STRATEGY - Đăng nhập bằng Email/Password
  * ============================================================
- * Implements AuthProvider cho LOCAL authentication.
+ * Implements AuthStrategy cho LOCAL authentication.
  * Tìm user trong Customer hoặc Employee table.
  * Verify password bằng BCrypt.
  * ============================================================
@@ -32,7 +32,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class LocalAuthProvider implements AuthProvider {
+public class LocalAuthStrategy implements AuthStrategy {
 
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;

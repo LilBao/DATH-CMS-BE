@@ -21,6 +21,7 @@ spring.log
 application.yml
 application-*.yml
 application-*.properties
+src/main/resources/
 
 # OS files
 .DS_Store
