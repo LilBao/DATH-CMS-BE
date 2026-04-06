@@ -40,7 +40,7 @@ public class PaymentController {
     }
 
     @Operation(summary = "Xử lý callback thanh toán", description = "Nhận và xử lý kết quả trả về từ cổng thanh toán sau khi người dùng thực hiện giao dịch.")
-    @GetMapping("/call-back")
+    @GetMapping("/callback")
     public ResponseEntity<ApiResponse<PaymentCallbackResponse>> paymentCallback(HttpServletRequest request) {
         PaymentCallbackResponse response = paymentService.paymentCallback(request);
         sseService.sendEventPayment(
