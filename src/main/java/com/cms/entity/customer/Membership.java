@@ -1,5 +1,6 @@
 package com.cms.entity.customer;
 
+import com.cms.enums.ERank;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +31,7 @@ public class Membership {
      */
     @Column(name = "member_rank", nullable = false)
     @Builder.Default
-    private Integer memberRank = 1;
+    private ERank memberRank = ERank.BRONZE;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "c_user_id", nullable = false, unique = true)

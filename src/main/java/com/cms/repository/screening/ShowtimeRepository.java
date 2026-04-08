@@ -12,6 +12,10 @@ import java.util.List;
 @Repository
 public interface ShowtimeRepository extends JpaRepository<Showtime, Integer> {
 
+    List<Showtime> findByMovieMovieId(Integer movieId);
+
+    List<Showtime> findByDayBetween(LocalDate from, LocalDate to);
+
     @Query("SELECT s FROM Showtime s WHERE s.movie.movieId = :movieId AND s.day = :day")
     List<Showtime> findByMovieAndDay(
             @Param("movieId") Integer movieId,
@@ -28,4 +32,7 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, Integer> {
             @Param("movieId") Integer movieId,
             @Param("branchId") Integer branchId,
             @Param("day") LocalDate day);
+
+    boolean existsByScreenRoomIdBranchIdAndScreenRoomIdRoomIdAndDayAndStartTime(
+            Integer branchId, Integer roomId, LocalDate day, java.time.LocalTime startTime);
 }

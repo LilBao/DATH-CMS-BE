@@ -1,5 +1,6 @@
 package com.cms.entity.cinema;
 
+import com.cms.enums.ERType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,6 @@ import java.util.List;
 
 /**
  * Maps to: Cinema.SCREENROOM
- * RType: Standard, IMAX, 4DX
  */
 @Entity
 @Table(name = "screen_room")
@@ -23,7 +23,7 @@ public class ScreenRoom {
     private ScreenRoomId id;
 
     @Column(name = "r_type", length = 30)
-    private String rType;
+    private ERType rType;
 
     @Column(name = "r_capacity")
     private Integer rCapacity;
