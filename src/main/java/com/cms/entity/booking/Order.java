@@ -4,6 +4,7 @@ import com.cms.entity.customer.Customer;
 import com.cms.entity.products.AddonItem;
 import com.cms.entity.screening.Ticket;
 import com.cms.entity.staff.Employee;
+import com.cms.enums.EOrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,11 +42,21 @@ public class Order {
 
     @Column(name = "total", precision = 10, scale = 2, nullable = false)
     private BigDecimal total;
+    
+    @Column(name = "original_total", precision = 10, scale = 2)
+    private BigDecimal originalTotal;
+
+    @Column(name = "discount_amount", precision = 10, scale = 2)
+    private BigDecimal discountAmount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    private Coupon coupon;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", length = 20)
     @Builder.Default
-    private OrderStatus orderStatus = OrderStatus.PENDING;
+    private EOrderStatus orderStatus = EOrderStatus.PENDING;
 
     /**
      * Khách hàng đặt vé online
@@ -70,11 +81,4 @@ public class Order {
     @Builder.Default
     @ToString.Exclude
     private List<AddonItem> addonItems = new ArrayList<>();
-
-    public enum OrderStatus {
-        PENDING,    // Đang chờ thanh toán
-        PAID,       // Đã thanh toán
-        CANCELLED,  // Đã huỷ
-        REFUNDED    // Đã hoàn tiền
-    }
 }

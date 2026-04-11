@@ -6,6 +6,10 @@ import com.cms.dto.payment.PaymentCallbackResponse;
 import com.cms.entity.booking.Order;
 import com.cms.entity.booking.Payment;
 import com.cms.entity.booking.PaymentHistory;
+import com.cms.entity.customer.Membership;
+import com.cms.enums.EOrderStatus;
+import com.cms.enums.EPaymentMethod;
+import com.cms.enums.EPaymentStatus;
 import com.cms.repository.booking.OrderRepository;
 import com.cms.repository.booking.PaymentHistoryRepository;
 import com.cms.repository.booking.PaymentRepository;
@@ -41,8 +45,8 @@ public class PaymentServiceImpl implements PaymentService {
             Payment payment = Payment.builder()
                     .order(order)
                     .amount(request.getAmount())
-                    .paymentMethod(Payment.PaymentMethod.valueOf(method.toUpperCase()))
-                    .paymentStatus(Payment.PaymentStatus.PENDING)
+                    .paymentMethod(EPaymentMethod.valueOf(method.toUpperCase()))
+                    .paymentStatus(EPaymentStatus.PENDING)
                     .paymentTime(LocalDateTime.now())
                     .build();
             paymentRepository.save(payment);
@@ -84,15 +88,28 @@ public class PaymentServiceImpl implements PaymentService {
                 if (optionalPayment.isPresent()) {
                     Payment payment = optionalPayment.get();
                     
-                    Payment.PaymentStatus newStatus = "SUCCESS".equalsIgnoreCase(response.getStatus()) 
-                            ? Payment.PaymentStatus.COMPLETED 
-                            : Payment.PaymentStatus.FAILED;
+                    EPaymentStatus newStatus = "SUCCESS".equalsIgnoreCase(response.getStatus()) 
+                            ? EPaymentStatus.COMPLETED 
+                            : EPaymentStatus.FAILED;
                             
                     payment.setPaymentStatus(newStatus);
                     if (response.getTransactionId() != null) {
                         payment.setTransactionId(response.getTransactionId());
                     }
                     paymentRepository.save(payment);
+
+                    if (newStatus == EPaymentStatus.COMPLETED) {
+                        Order pOrder = payment.getOrder();
+                        if (pOrder != null) {
+                            pOrder.setOrderStatus(EOrderStatus.PAID);
+                            if (pOrder.getCustomer() != null && pOrder.getCustomer().getMembership() != null) {
+                                Membership membership = pOrder.getCustomer().getMembership();
+                                int earnedPoints = payment.getAmount().divide(Math.BigDecimal(1000)).intValue();
+                                membership.setPoint(membership.getPoint() + earnedPoints);
+                            }
+                            orderRepository.save(pOrder);
+                        }
+                    }
 
                     PaymentHistory history = PaymentHistory.builder()
                             .payment(payment)

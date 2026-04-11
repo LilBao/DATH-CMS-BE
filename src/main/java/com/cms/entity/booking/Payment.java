@@ -1,5 +1,7 @@
 package com.cms.entity.booking;
 
+import com.cms.enums.EPaymentMethod;
+import com.cms.enums.EPaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -37,12 +39,12 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", length = 50, nullable = false)
-    private PaymentMethod paymentMethod;
+    private EPaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", length = 50, nullable = false)
     @Builder.Default
-    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+    private EPaymentStatus paymentStatus = EPaymentStatus.PENDING;
 
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
@@ -56,22 +58,4 @@ public class Payment {
     @ToString.Exclude
     private List<PaymentHistory> histories = new ArrayList<>();
 
-    public enum PaymentMethod {
-        CASH,
-        CREDIT_CARD,
-        DEBIT_CARD,
-        E_WALLET,
-        ZALOPAY,
-        MOMO,
-        VNPAY,
-        BANK_TRANSFER
-    }
-
-    public enum PaymentStatus {
-        PENDING,
-        COMPLETED,
-        FAILED,
-        REFUNDED,
-        CANCELLED
-    }
 }

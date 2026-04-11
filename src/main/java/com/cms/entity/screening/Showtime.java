@@ -3,6 +3,7 @@ package com.cms.entity.screening;
 import com.cms.entity.cinema.ScreenRoom;
 import com.cms.entity.movie.Format;
 import com.cms.entity.movie.Movie;
+import com.cms.enums.EShowtimeStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -65,14 +66,11 @@ public class Showtime {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)
     @Builder.Default
-    private ShowtimeStatus status = ShowtimeStatus.SCHEDULED;
+    private EShowtimeStatus status = EShowtimeStatus.SCHEDULED;
 
     @OneToMany(mappedBy = "showtime", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     @ToString.Exclude
     private List<Ticket> tickets = new ArrayList<>();
 
-    public enum ShowtimeStatus {
-        SCHEDULED, ONGOING, COMPLETED, CANCELLED
-    }
 }

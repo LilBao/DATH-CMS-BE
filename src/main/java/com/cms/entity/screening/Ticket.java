@@ -2,6 +2,7 @@ package com.cms.entity.screening;
 
 import com.cms.entity.booking.Order;
 import com.cms.entity.cinema.Seat;
+import com.cms.enums.ETicketStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,7 +44,7 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     @Column(name = "ticket_status", length = 20)
     @Builder.Default
-    private TicketStatus ticketStatus = TicketStatus.SOLD;
+    private ETicketStatus ticketStatus = ETicketStatus.SOLD;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "time_id", nullable = false)
@@ -65,7 +66,4 @@ public class Ticket {
     })
     private Seat seat;
 
-    public enum TicketStatus {
-        SOLD, CHECKED_IN, REFUNDED
-    }
 }

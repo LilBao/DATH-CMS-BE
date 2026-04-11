@@ -1,5 +1,6 @@
 package com.cms.entity.booking;
 
+import com.cms.enums.EPaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,9 +9,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Dùng để lưu vết các giao dịch/thay đổi trạng thái thanh toán (đặc biệt là callback từ ví điện tử)
- */
 @Entity
 @Table(name = "payment_history")
 @EntityListeners(AuditingEntityListener.class)
@@ -32,7 +30,7 @@ public class PaymentHistory {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", length = 50, nullable = false)
-    private Payment.PaymentStatus paymentStatus;
+    private EPaymentStatus paymentStatus;
 
     @Column(name = "amount", precision = 10, scale = 2)
     private BigDecimal amount;

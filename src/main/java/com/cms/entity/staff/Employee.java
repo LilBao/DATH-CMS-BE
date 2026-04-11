@@ -2,6 +2,7 @@ package com.cms.entity.staff;
 
 import com.cms.common.enums.UserType;
 import com.cms.entity.cinema.Branch;
+import com.cms.enums.ESex;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -40,7 +41,7 @@ public class Employee {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sex", length = 1)
-    private Sex sex;
+    private ESex sex;
 
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
@@ -106,7 +107,4 @@ public class Employee {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public enum Sex {
-        M, F
-    }
 }

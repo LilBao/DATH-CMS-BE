@@ -2,6 +2,7 @@ package com.cms.entity.customer;
 
 import com.cms.common.enums.AuthProviderType;
 import com.cms.common.enums.UserType;
+import com.cms.enums.ESex;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -36,7 +37,7 @@ public class Customer {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sex", length = 1)
-    private Sex sex;
+    private ESex sex;
 
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
@@ -82,7 +83,4 @@ public class Customer {
     @ToString.Exclude
     private Membership membership;
 
-    public enum Sex {
-        M, F
-    }
 }
