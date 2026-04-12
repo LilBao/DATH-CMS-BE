@@ -13,12 +13,12 @@ import com.cms.enums.EPaymentStatus;
 import com.cms.repository.booking.OrderRepository;
 import com.cms.repository.booking.PaymentHistoryRepository;
 import com.cms.repository.booking.PaymentRepository;
-import com.cms.service.sse.SSEService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -73,7 +73,6 @@ public class PaymentServiceImpl implements PaymentService {
         
         String orderIdStr = response.getOrderId();
         if (orderIdStr == null || orderIdStr.isEmpty()) {
-            // fallback, try to extract from VNPay order info if mapped like that
             String vnpOrderInfo = httpRequest.getParameter("vnp_OrderInfo");
             if (vnpOrderInfo != null && vnpOrderInfo.startsWith("Thanh toan don hang ")) {
                 orderIdStr = vnpOrderInfo.substring("Thanh toan don hang ".length());
@@ -104,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
                             pOrder.setOrderStatus(EOrderStatus.PAID);
                             if (pOrder.getCustomer() != null && pOrder.getCustomer().getMembership() != null) {
                                 Membership membership = pOrder.getCustomer().getMembership();
-                                int earnedPoints = payment.getAmount().divide(Math.BigDecimal(1000)).intValue();
+                                int earnedPoints = payment.getAmount().divide(new BigDecimal(1000)).intValue();
                                 membership.setPoint(membership.getPoint() + earnedPoints);
                             }
                             orderRepository.save(pOrder);

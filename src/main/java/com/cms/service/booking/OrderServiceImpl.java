@@ -1,8 +1,6 @@
 package com.cms.service.booking;
 
 import com.cms.common.exception.AppException;
-import com.cms.dto.payment.PaymentRequest;
-import com.cms.dto.payment.PaymentResponse;
 import com.cms.dto.request.OrderRequest;
 import com.cms.dto.response.OrderResponse;
 import com.cms.entity.booking.Coupon;
@@ -24,7 +22,6 @@ import com.cms.repository.customer.CustomerRepository;
 import com.cms.repository.screening.ShowtimeRepository;
 import com.cms.repository.staff.EmployeeRepository;
 import com.cms.service.payment.PaymentService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse getById(String id) {
         Order order = orderRepository.findById(Integer.parseInt(id))
-                .orElseThrow(() -> AppException.notFound("Không tìm thấy Order: " + id));
+                .orElseThrow(() -> AppException.notFound("Không tìm thấy Order: ", id));
         return mapToResponse(order);
     }
 
@@ -71,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByCustomerEmail(email)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> AppException.notFound("Không tìm thấy Order cho email: " + email));
+                .orElseThrow(() -> AppException.notFound("Không tìm thấy Order cho email: ", email));
         return mapToResponse(order);
     }
 
@@ -106,11 +103,11 @@ public class OrderServiceImpl implements OrderService {
         if (request.getTickets() != null) {
             for (OrderRequest.TicketRequest tr : request.getTickets()) {
                 Showtime showtime = showtimeRepository.findById(tr.getShowtimeId())
-                        .orElseThrow(() -> AppException.notFound("Không tìm thấy suất chiếu."));
+                        .orElseThrow(() -> AppException.notFound("Không tìm thấy suất chiếu.", tr.getShowtimeId()));
                 
                 SeatId seatId = new SeatId(tr.getBranchId(), tr.getRoomId(), tr.getSRow(), tr.getSColumn());
                 Seat seat = seatRepository.findById(seatId)
-                        .orElseThrow(() -> AppException.notFound("Ghế không tồn tại."));
+                        .orElseThrow(() -> AppException.notFound("Ghế không tồn tại.", seatId));
                 
                 BigDecimal p = tr.getTPrice() != null ? tr.getTPrice() : BigDecimal.ZERO;
                 originalTotal = originalTotal.add(p);

@@ -8,6 +8,7 @@ import com.cms.entity.cinema.ScreenRoomId;
 import com.cms.entity.movie.Format;
 import com.cms.entity.movie.Movie;
 import com.cms.entity.screening.Showtime;
+import com.cms.enums.EShowtimeStatus;
 import com.cms.repository.cinema.ScreenRoomRepository;
 import com.cms.repository.movie.FormatRepository;
 import com.cms.repository.movie.MovieRepository;
@@ -71,7 +72,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
                 .day(request.getDay())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
-                .status(Showtime.ShowtimeStatus.SCHEDULED)
+                .status(EShowtimeStatus.SCHEDULED)
                 .tickets(new ArrayList<>())
                 .build();
     }
@@ -139,7 +140,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         Showtime showtime = showtimeRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Showtime", id));
         try {
-            showtime.setStatus(Showtime.ShowtimeStatus.valueOf(status.toUpperCase()));
+            showtime.setStatus(EShowtimeStatus.valueOf(status.toUpperCase()));
         } catch (IllegalArgumentException e) {
             throw AppException.badRequest("Invalid status: " + status);
         }
