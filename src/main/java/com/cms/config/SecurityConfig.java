@@ -35,18 +35,17 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserPrincipalService userPrincipalService;
 
+    private static final String API_V1 = "/api/v1";
+
     // ── Public Endpoints (no auth needed) ───────────────────────
     private static final String[] PUBLIC_ENDPOINTS = {
             "/auth/**",
-            "/movies/**",
-            "/showtimes/**",
-            "/branches/**",
             "/actuator/health",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/api/v1/payments/**"
+            API_V1 + "/payments/callback",
+            API_V1 + "/payments/subscribe"
     };
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -65,25 +64,36 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/movies", "/movies/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/showtimes/**").permitAll()
 
-                        // Customer endpoints
-                        .requestMatchers("/bookings/**").hasAnyRole("MEMBER", "GUEST")
-                        .requestMatchers("/reviews/**").hasRole("MEMBER")
+                        // ===== Public GET APIs =====
+                        // Cho phép xem danh sách/chi tiết phim, suất chiếu, chi nhánh, menu, danh mục mà không cần đăng nhập
+                        .requestMatchers(HttpMethod.GET, 
+                                API_V1 + "/movies/**", 
+                                API_V1 + "/showtimes/**", 
+                                API_V1 + "/branches/**", 
+                                API_V1 + "/food-drinks/**", 
+                                API_V1 + "/catalog/**").permitAll()
 
-                        // Staff endpoints
-                        .requestMatchers("/staff/**").hasAnyRole("STAFF", "MANAGER", "ADMIN")
-                        .requestMatchers("/pos/**").hasAnyRole("STAFF", "MANAGER")
+                        // ===== Files =====
+                        .requestMatchers(API_V1 + "/files/**").hasAnyRole("STAFF", "MANAGER", "ADMIN")
 
-                        // Manager endpoints
-                        .requestMatchers("/admin/showtimes/**").hasAnyRole("MANAGER", "ADMIN")
+                        // ===== Orders & Payments =====
+                        // Bất kỳ ai đăng nhập đều có thể xem lịch sử, tạo đơn, tạo payment
+                        .requestMatchers(HttpMethod.POST, API_V1 + "/orders/**", API_V1 + "/payments/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, API_V1 + "/orders/**").authenticated()
 
-                        // Admin only
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/movies/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/movies/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/movies/**").hasRole("ADMIN")
+                        // ===== Management APIs (MANAGER, ADMIN) =====
+                        // Quản lý các module cơ bản: Phim, suất chiếu, chi nhánh, kho bắp nước, danh mục,...
+                        .requestMatchers(API_V1 + "/movies/**", 
+                                API_V1 + "/showtimes/**", 
+                                API_V1 + "/branches/**", 
+                                API_V1 + "/food-drinks/**", 
+                                API_V1 + "/catalog/**",
+                                API_V1 + "/customers/**").hasAnyRole("MANAGER", "ADMIN")
+
+                        // ===== Admin only =====
+                        // Quản lý nhân sự
+                        .requestMatchers(API_V1 + "/employees/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
@@ -103,9 +113,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:8080"
+                "http://localhost:3000",        // Frontend customer
+                "http://localhost:3001",        // Frontend dashboard
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList(
