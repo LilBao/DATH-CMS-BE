@@ -13,6 +13,7 @@ import com.cms.enums.EPaymentStatus;
 import com.cms.repository.booking.OrderRepository;
 import com.cms.repository.booking.PaymentHistoryRepository;
 import com.cms.repository.booking.PaymentRepository;
+import com.cms.service.email.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final OrderRepository orderRepository;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -107,6 +109,13 @@ public class PaymentServiceImpl implements PaymentService {
                                 membership.setPoint(membership.getPoint() + earnedPoints);
                             }
                             orderRepository.save(pOrder);
+                            
+                            // Send confirmation email
+                            String emailTo = pOrder.getCustomer() != null ? pOrder.getCustomer().getEmail() : 
+                                            (pOrder.getEmployee() != null ? pOrder.getEmployee().getEmail() : null);
+                            if (emailTo != null && !emailTo.isEmpty()) {
+                                emailService.sendOrderConfirmationEmail(emailTo, pOrder);
+                            }
                         }
                     }
 

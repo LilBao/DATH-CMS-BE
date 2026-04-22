@@ -94,6 +94,16 @@ public class Movie {
     @ToString.Exclude
     private Set<Actor> actors = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "directs",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "full_name")
+    )
+    @Builder.Default
+    @ToString.Exclude
+    private Set<Director> directors = new HashSet<>();
+
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     @ToString.Exclude
