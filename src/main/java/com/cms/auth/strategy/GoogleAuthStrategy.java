@@ -7,6 +7,7 @@ import com.cms.common.enums.UserType;
 import com.cms.common.exception.AppException;
 import com.cms.entity.customer.Customer;
 import com.cms.entity.customer.Membership;
+import com.cms.enums.ERank;
 import com.cms.repository.customer.CustomerRepository;
 import com.cms.repository.customer.MembershipRepository;
 import com.cms.security.jwt.JwtTokenBlacklist;
@@ -167,7 +168,7 @@ public class GoogleAuthStrategy implements AuthStrategy {
 
         Membership membership = Membership.builder()
                 .point(0)
-                .memberRank(1)
+                .memberRank(ERank.BRONZE)
                 .customer(saved)
                 .build();
         membershipRepository.save(membership);

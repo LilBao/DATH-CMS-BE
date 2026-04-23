@@ -66,7 +66,7 @@ public class EmailServiceImpl implements EmailService {
                 Ticket firstTicket = order.getTickets().get(0);
                 context.setVariable("movieName", firstTicket.getShowtime().getMovie().getMName());
                 context.setVariable("branchName", firstTicket.getSeat().getScreenRoom().getBranch().getBName());
-                context.setVariable("roomName", firstTicket.getSeat().getScreenRoom().getRName());
+                context.setVariable("roomName", firstTicket.getSeat().getScreenRoom().getId());
                 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 context.setVariable("showTime", firstTicket.getShowtime().getStartTime().format(formatter));

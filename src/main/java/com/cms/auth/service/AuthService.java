@@ -7,6 +7,8 @@ import com.cms.common.enums.UserType;
 import com.cms.common.exception.AppException;
 import com.cms.entity.customer.Customer;
 import com.cms.entity.customer.Membership;
+import com.cms.enums.ERank;
+import com.cms.enums.ESex;
 import com.cms.repository.customer.CustomerRepository;
 import com.cms.repository.customer.MembershipRepository;
 import com.cms.security.jwt.JwtTokenBlacklist;
@@ -78,7 +80,7 @@ public class AuthService {
                 .ePassword(passwordEncoder.encode(request.getPassword()))
                 .phoneNumber(request.getPhoneNumber())
                 .sex(request.getSex() != null ?
-                        com.cms.entity.customer.Customer.Sex.valueOf(request.getSex()) : null)
+                        ESex.valueOf(request.getSex()) : null)
                 .userType(UserType.MEMBER)
                 .authProvider(AuthProviderType.LOCAL)
                 .isActive(true)
@@ -89,7 +91,7 @@ public class AuthService {
         // Tạo Membership mặc định (Bronze - rank 1)
         Membership membership = Membership.builder()
                 .point(0)
-                .memberRank(1)
+                .memberRank(ERank.BRONZE)
                 .customer(saved)
                 .build();
         membershipRepository.save(membership);
