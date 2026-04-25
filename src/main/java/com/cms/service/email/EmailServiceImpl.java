@@ -3,6 +3,7 @@ package com.cms.service.email;
 import com.cms.entity.booking.Order;
 import com.cms.entity.screening.Ticket;
 import com.cms.entity.cinema.SeatId;
+import com.cms.repository.booking.OrderRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
+    private final OrderRepository orderRepository;
 
     @Value("${spring.mail.username:noreply@cms.com}")
     private String fromEmail;
@@ -50,8 +52,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     @Async
     @Transactional(readOnly = true)
-    public void sendOrderConfirmationEmail(String to, Order order) {
+    public void sendOrderConfirmationEmail(String to, Integer orderId) {
         try {
+            Order order = orderRepository.findByIdWithDetails(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Order not found for email: " + orderId));
+
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -61,15 +66,20 @@ public class EmailServiceImpl implements EmailService {
 
             Context context = new Context();
             context.setVariable("order", order);
-            
+
             if (order.getTickets() != null && !order.getTickets().isEmpty()) {
                 Ticket firstTicket = order.getTickets().get(0);
-                context.setVariable("movieName", firstTicket.getShowtime().getMovie().getMName());
-                context.setVariable("branchName", firstTicket.getSeat().getScreenRoom().getBranch().getBName());
-                context.setVariable("roomName", firstTicket.getSeat().getScreenRoom().getId());
+                String branchName = firstTicket.getSeat().getScreenRoom().getBranch().getBName();
+                String movieName = firstTicket.getShowtime().getMovie().getMName();
+                
+                helper.setSubject("Đặt vé thành công - " + branchName + " - CMS Cinema");
+
+                context.setVariable("movieName", movieName);
+                context.setVariable("branchName", branchName);
+                context.setVariable("roomName", "Phòng " + firstTicket.getSeat().getScreenRoom().getId().getRoomId());
                 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                context.setVariable("showTime", firstTicket.getShowtime().getStartTime().format(formatter));
+                context.setVariable("showTime", firstTicket.getShowtime().getDay().atTime(firstTicket.getShowtime().getStartTime()).format(formatter));
                 context.setVariable("posterUrl", firstTicket.getShowtime().getMovie().getPosterUrl() != null 
                     ? firstTicket.getShowtime().getMovie().getPosterUrl() 
                     : "https://via.placeholder.com/300x450");

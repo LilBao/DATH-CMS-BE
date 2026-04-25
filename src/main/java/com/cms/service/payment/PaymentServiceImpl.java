@@ -137,7 +137,7 @@ public class PaymentServiceImpl implements PaymentService {
                                             (pOrder.getEmployee() != null ? pOrder.getEmployee().getEmail() : null);
                             if (emailTo != null && !emailTo.isEmpty()) {
                                 log.info("Sending confirmation email to: {}", emailTo);
-                                emailService.sendOrderConfirmationEmail(emailTo, pOrder);
+                                emailService.sendOrderConfirmationEmail(emailTo, pOrder.getOrderId());
                             }
                         }
                     }
