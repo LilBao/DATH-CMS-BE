@@ -21,7 +21,7 @@ public class Seat {
     private SeatId id;
 
     /**
-     * false = Standard, true = VIP
+     * 1: STANDARD, 2: VIP, 3: SWEETBOX
      */
     @Column(name = "s_type", nullable = false)
     private Integer sType;

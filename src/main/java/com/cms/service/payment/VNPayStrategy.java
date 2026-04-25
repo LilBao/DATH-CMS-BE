@@ -88,8 +88,7 @@ public class VNPayStrategy implements PaymentStrategy {
     }
 
     @Override
-    public PaymentCallbackResponse processCallback(HttpServletRequest request) {
-
+    public PaymentCallbackResponse processIPN(HttpServletRequest request) {
         Map<String, String> fields = new HashMap<>();
 
         Enumeration<String> params = request.getParameterNames();

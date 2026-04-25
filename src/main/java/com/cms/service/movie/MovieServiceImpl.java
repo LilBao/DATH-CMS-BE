@@ -5,6 +5,7 @@ import com.cms.dto.request.MovieRequest;
 import com.cms.dto.response.MovieResponse;
 import com.cms.entity.movie.*;
 import com.cms.repository.movie.*;
+import com.cms.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -51,8 +52,6 @@ public class MovieServiceImpl implements MovieService {
         }
     }
 
-    // ── Query ──────────────────────────────────────────────────
-
     @Override
     @Transactional(readOnly = true)
     public List<MovieResponse> getAll() {
@@ -96,12 +95,22 @@ public class MovieServiceImpl implements MovieService {
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
+    @Override
+    public MovieResponse getBySlug(String slug) {
+        Movie movie = movieRepository.findBySlug(slug);
+        if (movie == null) {
+            throw AppException.notFound("Movie", slug);
+        }
+        return toResponse(movie);
+    }
+
     // ── Mutation ───────────────────────────────────────────────
 
     @Override
     public MovieResponse create(MovieRequest request) {
         Movie movie = Movie.builder().build();
         applyRequest(movie, request);
+        movie.setSlug(CommonUtil.generateUniqueSlug(movie.getMName()));
         return toResponse(movieRepository.save(movie));
     }
 

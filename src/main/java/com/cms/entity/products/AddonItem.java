@@ -31,6 +31,9 @@ public class AddonItem {
     @Column(name = "item_type", length = 50)
     private String itemType;
 
+    @Column(name = "img_url", length = 1000)
+    private String imgUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;

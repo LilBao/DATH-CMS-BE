@@ -101,8 +101,8 @@ momo:
   access-key: ${MOMO_ACCESS_KEY:F8BBA842ECF85}
   secret-key: ${MOMO_SECRET_KEY:K951B6PE1waDMi640xX08PD3vg6EkVlz}
   endpoint: ${MOMO_ENDPOINT:https://test-payment.momo.vn/v2/gateway/api/create}
-  redirect-url: ${MOMO_REDIRECT_URL:http://localhost:8081/api/v1/payments/callback}
-  ipn-url: ${MOMO_IPN_URL:http://localhost:8081/api/v1/payment/momo-ipn}
+  redirect-url: ${MOMO_REDIRECT_URL:http://localhost:3000/checkout/status}
+  ipn-url: ${MOMO_IPN_URL:https://2e0c-123-21-239-224.ngrok-free.app/api/v1/payments/ipn}
 
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME:}

@@ -23,9 +23,7 @@ public class CashStrategy implements PaymentStrategy {
     }
 
     @Override
-    public PaymentCallbackResponse processCallback(HttpServletRequest httpRequest) {
-        // Cash payment does not typically have an automated web callback, 
-        // but we handle it just to comply with the interface.
+    public PaymentCallbackResponse processIPN(HttpServletRequest httpRequest) {
         return PaymentCallbackResponse.builder()
                 .status("SUCCESS")
                 .message("Cash payment verified")

@@ -14,4 +14,5 @@ public class PaymentCallbackResponse {
     private String orderId;
     private String status;
     private String message;
+    private String rawResponse;
 }

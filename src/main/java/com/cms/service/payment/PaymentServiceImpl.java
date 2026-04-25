@@ -16,6 +16,7 @@ import com.cms.repository.booking.PaymentRepository;
 import com.cms.service.email.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
@@ -60,19 +61,36 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public PaymentCallbackResponse paymentCallback(HttpServletRequest httpRequest) {
+    public PaymentCallbackResponse processIPN(HttpServletRequest httpRequest) {
+        String provider = detectProvider(httpRequest);
+        log.info("Detected payment provider for IPN: {}", provider);
+        PaymentStrategy strategy = getStrategy(provider);
+        PaymentCallbackResponse response = strategy.processIPN(httpRequest);
+        return handleCommonPaymentLogic(response, httpRequest);
+    }
+
+    private String detectProvider(HttpServletRequest httpRequest) {
         String provider = httpRequest.getParameter("provider");
-        if (provider == null || provider.isEmpty()) {
-            if ("MOMO".equals(httpRequest.getParameter("partnerCode"))) {
-                provider = "MOMO";
-            } else {
-                provider = "VNPAY";
-            }
+        if (provider != null && !provider.isEmpty()) return provider;
+
+        // Kiểm tra Content-Type để phát hiện JSON (đặc trưng của Momo IPN)
+        String contentType = httpRequest.getContentType();
+        if (contentType != null && contentType.contains("application/json")) {
+            return "MOMO";
+        }
+
+        if (httpRequest.getParameter("partnerCode") != null) {
+            return "MOMO";
         }
         
-        PaymentStrategy strategy = getStrategy(provider);
-        PaymentCallbackResponse response = strategy.processCallback(httpRequest);
-        
+        if (httpRequest.getParameter("vnp_TxnRef") != null || httpRequest.getParameter("vnp_ResponseCode") != null) {
+            return "VNPAY";
+        }
+
+        return "VNPAY"; // Default
+    }
+
+    private PaymentCallbackResponse handleCommonPaymentLogic(PaymentCallbackResponse response, HttpServletRequest httpRequest) {
         String orderIdStr = response.getOrderId();
         if (orderIdStr == null || orderIdStr.isEmpty()) {
             String vnpOrderInfo = httpRequest.getParameter("vnp_OrderInfo");
@@ -85,6 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (orderIdStr != null && !orderIdStr.isEmpty()) {
             try {
                 Integer orderId = Integer.parseInt(orderIdStr);
+                log.info("Processing common logic for Order ID: {}", orderId);
                 Optional<Payment> optionalPayment = paymentRepository.findByOrder_OrderId(orderId);
                 if (optionalPayment.isPresent()) {
                     Payment payment = optionalPayment.get();
@@ -92,6 +111,8 @@ public class PaymentServiceImpl implements PaymentService {
                     EPaymentStatus newStatus = "SUCCESS".equalsIgnoreCase(response.getStatus()) 
                             ? EPaymentStatus.COMPLETED 
                             : EPaymentStatus.FAILED;
+                    
+                    log.info("Updating Payment status for order {}: {} -> {}", orderId, payment.getPaymentStatus(), newStatus);
                             
                     payment.setPaymentStatus(newStatus);
                     if (response.getTransactionId() != null) {
@@ -102,6 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
                     if (newStatus == EPaymentStatus.COMPLETED) {
                         Order pOrder = payment.getOrder();
                         if (pOrder != null) {
+                            log.info("Updating Order status to PAID for Order ID: {}", orderId);
                             pOrder.setOrderStatus(EOrderStatus.PAID);
                             if (pOrder.getCustomer() != null && pOrder.getCustomer().getMembership() != null) {
                                 Membership membership = pOrder.getCustomer().getMembership();
@@ -114,6 +136,7 @@ public class PaymentServiceImpl implements PaymentService {
                             String emailTo = pOrder.getCustomer() != null ? pOrder.getCustomer().getEmail() : 
                                             (pOrder.getEmployee() != null ? pOrder.getEmployee().getEmail() : null);
                             if (emailTo != null && !emailTo.isEmpty()) {
+                                log.info("Sending confirmation email to: {}", emailTo);
                                 emailService.sendOrderConfirmationEmail(emailTo, pOrder);
                             }
                         }
@@ -126,12 +149,17 @@ public class PaymentServiceImpl implements PaymentService {
                             .transactionId(response.getTransactionId())
                             .responseCode(httpRequest.getParameter("resultCode") != null ? httpRequest.getParameter("resultCode") : httpRequest.getParameter("vnp_ResponseCode"))
                             .responseMessage(response.getMessage())
-                            .rawResponse(httpRequest.getQueryString())
+                            .rawResponse(response.getRawResponse())
                             .build();
                     paymentHistoryRepository.save(history);
+                } else {
+                    log.warn("Payment not found for Order ID: {}", orderId);
                 }
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException e) {
+                log.error("Invalid Order ID format: {}", orderIdStr);
             }
+        } else {
+            log.warn("No Order ID found in payment response");
         }
 
         return response;

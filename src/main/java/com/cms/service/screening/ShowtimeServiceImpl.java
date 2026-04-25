@@ -107,8 +107,8 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ShowtimeResponse> getByMovie(Integer movieId) {
-        return showtimeRepository.findByMovieMovieId(movieId).stream()
+    public List<ShowtimeResponse> getByMovie(String slug) {
+        return showtimeRepository.findByMovieMovieSlug(slug).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 

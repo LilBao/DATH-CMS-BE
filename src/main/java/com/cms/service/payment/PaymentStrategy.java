@@ -8,5 +8,5 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface PaymentStrategy {
     boolean supports(String paymentMethod);
     PaymentResponse createPayment(PaymentRequest request, HttpServletRequest httpRequest);
-    PaymentCallbackResponse processCallback(HttpServletRequest httpRequest);
+    PaymentCallbackResponse processIPN(HttpServletRequest httpRequest);
 }

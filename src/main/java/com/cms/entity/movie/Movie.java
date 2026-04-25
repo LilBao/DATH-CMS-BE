@@ -27,6 +27,9 @@ public class Movie {
     @Column(name = "m_name", length = 255, nullable = false)
     private String mName;
 
+    @Column(name = "slug", length = 255, nullable = false)
+    private String slug;
+
     @Column(name = "descript", columnDefinition = "TEXT")
     private String descript;
 

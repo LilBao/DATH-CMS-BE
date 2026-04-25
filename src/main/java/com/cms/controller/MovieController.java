@@ -34,6 +34,12 @@ public class MovieController {
         return ResponseEntity.ok(ApiResponse.ok(movieService.getById(id)));
     }
 
+    @GetMapping("/slug/{slug}")
+    @Operation(summary = "Lấy thông tin phim theo slug")
+    public ResponseEntity<ApiResponse<MovieResponse>> getBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(ApiResponse.ok(movieService.getBySlug(slug)));
+    }
+
     @GetMapping("/now-showing")
     @Operation(summary = "Lấy danh sách phim đang chiếu")
     public ResponseEntity<ApiResponse<List<MovieResponse>>> getNowShowing() {

@@ -39,11 +39,11 @@ public class SecurityConfig {
 
     // ── Public Endpoints (no auth needed) ───────────────────────
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/auth/**",
+            API_V1 + "/auth/**",
             "/actuator/health",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            API_V1 + "/payments/callback",
+            API_V1 + "/payments/ipn",
             API_V1 + "/payments/subscribe"
     };
 
@@ -72,6 +72,8 @@ public class SecurityConfig {
                                 API_V1 + "/showtimes/**", 
                                 API_V1 + "/branches/**", 
                                 API_V1 + "/food-drinks/**", 
+                                API_V1 + "/merchandise/**",
+                                API_V1 + "/coupons/**",
                                 API_V1 + "/catalog/**").permitAll()
 
                         // ===== Files =====
@@ -88,6 +90,8 @@ public class SecurityConfig {
                                 API_V1 + "/showtimes/**", 
                                 API_V1 + "/branches/**", 
                                 API_V1 + "/food-drinks/**", 
+                                API_V1 + "/merchandise/**",
+                                API_V1 + "/coupons/**",
                                 API_V1 + "/catalog/**",
                                 API_V1 + "/customers/**").hasAnyRole("MANAGER", "ADMIN")
 

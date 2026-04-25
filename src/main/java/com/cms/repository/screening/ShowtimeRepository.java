@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface ShowtimeRepository extends JpaRepository<Showtime, Integer> {
-
-    List<Showtime> findByMovieMovieId(Integer movieId);
+    @Query("SELECT s FROM Showtime s WHERE s.movie.slug = :slug")
+    List<Showtime> findByMovieMovieSlug(String slug);
 
     List<Showtime> findByDayBetween(LocalDate from, LocalDate to);
 

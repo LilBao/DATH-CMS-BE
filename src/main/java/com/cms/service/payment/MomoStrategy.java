@@ -108,18 +108,41 @@ public class MomoStrategy implements PaymentStrategy {
     }
 
     @Override
-    public PaymentCallbackResponse processCallback(HttpServletRequest request) {
+    public PaymentCallbackResponse processIPN(HttpServletRequest request) {
         String resultCode = request.getParameter("resultCode");
         String message = request.getParameter("message");
         String extraData = request.getParameter("extraData");
         String transactionId = request.getParameter("orderId");
-        
+
+        String rawBody = null;
+        // Nếu các tham số đều null, có thể dữ liệu nằm trong JSON Body (đặc thù của Momo IPN)
+        if (resultCode == null && extraData == null) {
+            try {
+                // Đọc body và lưu lại chuỗi thô
+                byte[] bodyBytes = request.getInputStream().readAllBytes();
+                rawBody = new String(bodyBytes, StandardCharsets.UTF_8);
+                Map<String, Object> body = objectMapper.readValue(rawBody, Map.class);
+                log.info("Momo IPN Body: {}", body);
+                resultCode = String.valueOf(body.get("resultCode"));
+                message = String.valueOf(body.get("message"));
+                extraData = String.valueOf(body.get("extraData"));
+                transactionId = String.valueOf(body.get("orderId"));
+            } catch (Exception e) {
+                log.error("Failed to parse Momo IPN body", e);
+            }
+        }
+
+        log.info("Momo IPN result: resultCode={}, orderId(extraData)={}, transId={}", resultCode, extraData, transactionId);
+
+        String finalRawResponse = (request.getQueryString() != null) ? request.getQueryString() : rawBody;
+
         if ("0".equals(resultCode)) {
             return PaymentCallbackResponse.builder()
                     .orderId(extraData)
                     .transactionId(transactionId)
                     .status("SUCCESS")
                     .message("Payment success")
+                    .rawResponse(finalRawResponse)
                     .build();
         }
 
@@ -128,6 +151,7 @@ public class MomoStrategy implements PaymentStrategy {
                 .transactionId(transactionId)
                 .status("FAILED")
                 .message("Payment failed: " + message)
+                .rawResponse(finalRawResponse)
                 .build();
     }
 

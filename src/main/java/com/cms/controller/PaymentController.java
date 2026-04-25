@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+@Slf4j
 @Tag(name = "Payment", description = "Các API xử lý giao dịch và thanh toán đơn hàng")
 @RequiredArgsConstructor
 @RestController
@@ -29,7 +31,7 @@ public class PaymentController {
         return sseService.subPayment(orderId);
     }
 
-    @Operation(summary = "Tạo thanh toán", description = "Tạo yêu cầu thanh toán mới cho một đơn hàng (hỗ trợ VNPay, etc).")
+    @Operation(summary = "Tạo thanh toán", description = "Tạo yêu cầu thanh toán mới cho một đơn hàng.")
     @PostMapping()
     public ResponseEntity<ApiResponse<PaymentResponse>> createPayment(
             @Valid @RequestBody PaymentRequest paymentRequest, 
@@ -39,15 +41,20 @@ public class PaymentController {
         return ResponseEntity.status(201).body(ApiResponse.created(response));
     }
 
-    @Operation(summary = "Xử lý callback thanh toán", description = "Nhận và xử lý kết quả trả về từ cổng thanh toán sau khi người dùng thực hiện giao dịch.")
-    @GetMapping("/callback")
-    public ResponseEntity<ApiResponse<PaymentCallbackResponse>> paymentCallback(HttpServletRequest request) {
-        PaymentCallbackResponse response = paymentService.paymentCallback(request);
+    @Operation(summary = "Xử lý IPN thanh toán (POST/GET)", description = "Webhook nhận thông báo trạng thái từ cổng thanh toán.")
+    @RequestMapping(value = "/ipn", method = {RequestMethod.POST, RequestMethod.GET})
+    public ResponseEntity<Void> paymentIPN(HttpServletRequest request) {
+        log.info("Received IPN request");
+        PaymentCallbackResponse response = paymentService.processIPN(request);
+        
+        // Notify via SSE
         sseService.sendEventPayment(
                 response.getOrderId(),
                 "payment-status",
                 response.getStatus()
         );
-        return ResponseEntity.ok(ApiResponse.ok(response));
+        
+        // Trả về 204 No Content hoặc 200 OK tùy yêu cầu của cổng thanh toán
+        return ResponseEntity.ok().build();
     }
 }

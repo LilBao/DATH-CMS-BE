@@ -77,6 +77,11 @@ Các API dùng để quản lý chi nhánh và hệ thống phòng chiếu của
 | `POST` | `/api/v1/branches/{branchId}/rooms` | Tạo mới một phòng chiếu trong chi nhánh. |
 | `PUT` | `/api/v1/branches/{branchId}/rooms/{roomId}`| Cập nhật thông tin phòng chiếu. |
 | `DELETE` | `/api/v1/branches/{branchId}/rooms/{roomId}`| Xóa một phòng chiếu. |
+| `GET` | `/api/v1/branches/{branchId}/rooms/{roomId}/seats` | Lấy danh sách tất cả ghế trong phòng chiếu. |
+| `POST` | `/api/v1/branches/{branchId}/rooms/{roomId}/seats` | Tạo mới một ghế. |
+| `POST` | `/api/v1/branches/{branchId}/rooms/{roomId}/seats/bulk` | Tạo nhiều ghế cùng lúc. |
+| `PUT` | `/api/v1/branches/{branchId}/rooms/{roomId}/seats/{sRow}/{sColumn}` | Cập nhật thông tin ghế. |
+| `DELETE` | `/api/v1/branches/{branchId}/rooms/{roomId}/seats/{sRow}/{sColumn}` | Xóa một ghế. |
 
 ---
 
@@ -94,6 +99,7 @@ Các API để quản lý các suất chiếu phim.
 | `PUT` | `/api/v1/showtimes/{id}` | Cập nhật thông tin suất chiếu. |
 | `PATCH` | `/api/v1/showtimes/{id}/status?status={st}` | Cập nhật trạng thái suất chiếu. |
 | `DELETE` | `/api/v1/showtimes/{id}` | Xóa một suất chiếu. |
+| `GET` | `/api/v1/showtimes/{id}/seats` | Lấy danh sách ghế và trạng thái đặt chỗ của một suất chiếu. |
 
 ---
 
@@ -112,7 +118,34 @@ Các API quản lý sản phẩm bắp nước.
 
 ---
 
-## 7. Customer API (`/api/v1/customers`)
+## 7. Merchandise API (`/api/v1/merchandise`)
+Các API quản lý quà tặng, vật phẩm lưu niệm.
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/merchandise` | Lấy danh sách tất cả vật phẩm. |
+| `GET` | `/api/v1/merchandise/{id}` | Lấy thông tin vật phẩm theo ID. |
+| `GET` | `/api/v1/merchandise/search?name={name}` | Tìm kiếm vật phẩm theo tên. |
+| `POST` | `/api/v1/merchandise` | Tạo mới một vật phẩm. |
+| `PUT` | `/api/v1/merchandise/{id}` | Cập nhật thông tin vật phẩm. |
+| `DELETE` | `/api/v1/merchandise/{id}` | Xóa một vật phẩm. |
+
+---
+
+## 8. Coupon API (`/api/v1/coupons`)
+Các API quản lý mã giảm giá.
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/coupons` | Lấy danh sách tất cả coupon. |
+| `GET` | `/api/v1/coupons/{id}` | Lấy thông tin coupon theo ID. |
+| `POST` | `/api/v1/coupons` | Tạo mới một coupon. |
+| `PUT` | `/api/v1/coupons/{id}` | Cập nhật thông tin coupon. |
+| `DELETE` | `/api/v1/coupons/{id}` | Xóa một coupon. |
+
+---
+
+## 9. Customer API (`/api/v1/customers`)
 Các API phục vụ quản lý thông tin khách hàng.
 
 | Method | Endpoint | Description |

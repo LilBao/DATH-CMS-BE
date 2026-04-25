@@ -1,9 +1,12 @@
 package com.cms.common.response;
 
+import com.cms.dto.response.SeatResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -21,7 +24,7 @@ public class ApiResponse<T> {
     @Builder.Default
     private LocalDateTime timestamp = LocalDateTime.now();
 
-    public static <T> ApiResponse<T> ok(T data) {
+    public static @Nullable <T> ApiResponse<T> ok(T data) {
         return ApiResponse.<T>builder()
                 .success(true)
                 .status(200)

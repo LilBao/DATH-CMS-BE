@@ -17,6 +17,7 @@ public class MovieResponse {
     private Integer runTime;
     private Boolean isDub;
     private Boolean isSub;
+    private String slug;
     private LocalDate releaseDate;
     private LocalDate closingDate;
     private String ageRating;

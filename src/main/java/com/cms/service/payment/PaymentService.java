@@ -7,5 +7,5 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface PaymentService {
     PaymentResponse createPayment(PaymentRequest request, HttpServletRequest httpRequest);
-    PaymentCallbackResponse paymentCallback(HttpServletRequest httpRequest);
+    PaymentCallbackResponse processIPN(HttpServletRequest httpRequest);
 }

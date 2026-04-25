@@ -2,7 +2,9 @@ package com.cms.controller;
 
 import com.cms.common.response.ApiResponse;
 import com.cms.dto.request.ShowtimeRequest;
+import com.cms.dto.response.SeatResponse;
 import com.cms.dto.response.ShowtimeResponse;
+import com.cms.service.cinema.SeatService;
 import com.cms.service.screening.ShowtimeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ShowtimeController {
 
     private final ShowtimeService showtimeService;
+    private final SeatService seatService;
 
     @GetMapping
     @Operation(summary = "Lấy danh sách tất cả suất chiếu")
@@ -36,10 +39,10 @@ public class ShowtimeController {
         return ResponseEntity.ok(ApiResponse.ok(showtimeService.getById(id)));
     }
 
-    @GetMapping("/movie/{movieId}")
+    @GetMapping("/movie/{slug}")
     @Operation(summary = "Lấy danh sách suất chiếu theo phim")
-    public ResponseEntity<ApiResponse<List<ShowtimeResponse>>> getByMovie(@PathVariable Integer movieId) {
-        return ResponseEntity.ok(ApiResponse.ok(showtimeService.getByMovie(movieId)));
+    public ResponseEntity<ApiResponse<List<ShowtimeResponse>>> getByMovie(@PathVariable String slug) {
+        return ResponseEntity.ok(ApiResponse.ok(showtimeService.getByMovie(slug)));
     }
 
     @GetMapping("/movie/{movieId}/day")
@@ -86,5 +89,11 @@ public class ShowtimeController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Integer id) {
         showtimeService.delete(id);
         return ResponseEntity.ok(ApiResponse.ok("Showtime deleted successfully", null));
+    }
+
+    @GetMapping("/{id}/seats")
+    @Operation(summary = "Lấy danh sách ghế và trạng thái đặt chỗ của một suất chiếu")
+    public ResponseEntity<ApiResponse<List<SeatResponse>>> getSeats(@PathVariable Integer id) {
+        return ResponseEntity.ok(ApiResponse.ok(seatService.getByShowtime(id)));
     }
 }

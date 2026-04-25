@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Authentication", description = "Các API xác thực, đăng nhập, đăng ký và quản lý phiên của người dùng")
 @Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("${server.api-prefix}/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

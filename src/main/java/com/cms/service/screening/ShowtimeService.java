@@ -11,7 +11,7 @@ public interface ShowtimeService {
     ShowtimeResponse getById(Integer id);
     List<ShowtimeResponse> getByMovieAndDay(Integer movieId, LocalDate day);
     List<ShowtimeResponse> getByBranchAndDay(Integer branchId, LocalDate day);
-    List<ShowtimeResponse> getByMovie(Integer movieId);
+    List<ShowtimeResponse> getByMovie(String slug);
     ShowtimeResponse create(ShowtimeRequest request);
     ShowtimeResponse update(Integer id, ShowtimeRequest request);
     ShowtimeResponse updateStatus(Integer id, String status);

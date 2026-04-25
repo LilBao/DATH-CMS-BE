@@ -25,4 +25,6 @@ public class FoodDrinkRequest {
 
     @Min(value = 0)
     private Integer quantity;
+
+    private String imgUrl;
 }

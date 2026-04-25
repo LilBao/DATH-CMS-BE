@@ -8,6 +8,7 @@ import java.util.List;
 public interface MovieService {
     List<MovieResponse> getAll();
     MovieResponse getById(Integer id);
+    MovieResponse getBySlug(String slug);
     List<MovieResponse> getNowShowing();
     List<MovieResponse> getComingSoon();
     List<MovieResponse> searchByName(String name);

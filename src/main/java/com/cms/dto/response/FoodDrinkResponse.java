@@ -15,4 +15,5 @@ public class FoodDrinkResponse {
     private BigDecimal price;
     private Integer quantity;
     private String itemType;
+    private String imgUrl;
 }
