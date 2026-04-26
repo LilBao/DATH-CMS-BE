@@ -39,6 +39,9 @@ public class Customer {
     @Column(name = "sex", length = 1)
     private ESex sex;
 
+    @Column(name = "birthday")
+    private java.time.LocalDate birthday;
+
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 

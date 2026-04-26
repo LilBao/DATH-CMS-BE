@@ -112,21 +112,18 @@ public class AuthController {
 
         UserInfoResponse info = UserInfoResponse.builder()
                 .userId(currentUser.getUserId())
+                .name(currentUser.getName())
                 .email(currentUser.getEmail())
+                .avatarUrl(currentUser.getAvatarUrl())
+                .birthday(currentUser.getBirthday())
                 .role(currentUser.getAuthorities().iterator().next().getAuthority()
                         .replace("ROLE_", ""))
+                .membership(currentUser.getMemberRank() != null ? UserInfoResponse.MembershipInfo.builder()
+                        .rank(currentUser.getMemberRank().name())
+                        .points(currentUser.getPoint())
+                        .build() : null)
                 .build();
 
         return ResponseEntity.ok(ApiResponse.ok(info));
-    }
-
-    @lombok.Data
-    @lombok.Builder
-    @lombok.NoArgsConstructor
-    @lombok.AllArgsConstructor
-    static class UserInfoResponse {
-        private String userId;
-        private String email;
-        private String role;
     }
 }

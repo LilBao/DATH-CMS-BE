@@ -20,8 +20,13 @@ import java.util.List;
 public class UserPrincipal implements UserDetails {
 
     private final String userId;      // CUSxxx hoặc EMPxxx
+    private final String name;
     private final String email;
     private final String password;
+    private final String avatarUrl;
+    private final java.time.LocalDate birthday;
+    private final com.cms.enums.ERank memberRank;
+    private final Integer point;
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean isActive;
 
@@ -36,8 +41,13 @@ public class UserPrincipal implements UserDetails {
         );
         return UserPrincipal.builder()
                 .userId(customer.getCUserId())
+                .name(customer.getCName())
                 .email(customer.getEmail())
                 .password(customer.getEPassword())
+                .avatarUrl(customer.getAvatarUrl())
+                .birthday(customer.getBirthday())
+                .memberRank(customer.getMembership() != null ? customer.getMembership().getMemberRank() : null)
+                .point(customer.getMembership() != null ? customer.getMembership().getPoint() : null)
                 .authorities(authorities)
                 .isActive(customer.isActive())
                 .build();
@@ -52,8 +62,11 @@ public class UserPrincipal implements UserDetails {
         );
         return UserPrincipal.builder()
                 .userId(employee.getEUserId())
+                .name(employee.getEName())
                 .email(employee.getEmail())
                 .password(employee.getEPassword())
+                .avatarUrl(employee.getAvatarUrl())
+                .birthday(employee.getBirthday())
                 .authorities(authorities)
                 .isActive(employee.isActive())
                 .build();

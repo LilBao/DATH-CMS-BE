@@ -43,6 +43,9 @@ public class Employee {
     @Column(name = "sex", length = 1)
     private ESex sex;
 
+    @Column(name = "birthday")
+    private java.time.LocalDate birthday;
+
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
@@ -58,6 +61,9 @@ public class Employee {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", length = 15, nullable = false)
     private UserType userType;
+
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
 
     @Column(name = "is_active")
     @Builder.Default
