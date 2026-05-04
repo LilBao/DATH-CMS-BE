@@ -92,8 +92,10 @@ public class SecurityConfig {
                                 API_V1 + "/food-drinks/**", 
                                 API_V1 + "/merchandise/**",
                                 API_V1 + "/coupons/**",
-                                API_V1 + "/catalog/**",
-                                API_V1 + "/customers/**").hasAnyRole("MANAGER", "ADMIN")
+                                API_V1 + "/catalog/**").hasAnyRole("MANAGER", "ADMIN")
+                        
+                        // ===== Customer Profile & Management =====
+                        .requestMatchers(API_V1 + "/customers/**").hasAnyRole("MEMBER", "MANAGER", "ADMIN")
 
                         // ===== Admin only =====
                         // Quản lý nhân sự

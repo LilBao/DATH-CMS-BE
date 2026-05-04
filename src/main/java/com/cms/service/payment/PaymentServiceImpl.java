@@ -1,5 +1,6 @@
 package com.cms.service.payment;
 
+import com.cms.dto.payment.PaymentDetailResponse;
 import com.cms.dto.payment.PaymentRequest;
 import com.cms.dto.payment.PaymentResponse;
 import com.cms.dto.payment.PaymentCallbackResponse;
@@ -163,6 +164,39 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaymentDetailResponse getPaymentByOrderId(Integer orderId) {
+        Payment payment = paymentRepository.findByOrder_OrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Payment not found for Order: " + orderId));
+
+        return PaymentDetailResponse.builder()
+                .paymentId(payment.getPaymentId())
+                .orderId(payment.getOrder().getOrderId())
+                .transactionId(payment.getTransactionId())
+                .amount(payment.getAmount())
+                .paymentMethod(payment.getPaymentMethod().name())
+                .paymentStatus(payment.getPaymentStatus().name())
+                .paymentTime(payment.getPaymentTime())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaymentDetailResponse> getPaymentHistory(String userId) {
+        return paymentRepository.findByOrderCustomerCUserId(userId).stream()
+                .map(payment -> PaymentDetailResponse.builder()
+                        .paymentId(payment.getPaymentId())
+                        .orderId(payment.getOrder().getOrderId())
+                        .transactionId(payment.getTransactionId())
+                        .amount(payment.getAmount())
+                        .paymentMethod(payment.getPaymentMethod().name())
+                        .paymentStatus(payment.getPaymentStatus().name())
+                        .paymentTime(payment.getPaymentTime())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
     }
 
     private PaymentStrategy getStrategy(String method) {

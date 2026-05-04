@@ -64,6 +64,7 @@ public class ScreenRoomServiceImpl implements ScreenRoomService {
                 .id(pk)
                 .rType(ERType.valueOf(request.getRType()))
                 .rCapacity(request.getRCapacity())
+                .basePrice(request.getBasePrice())
                 .branch(branch)
                 .seats(new ArrayList<>())
                 .build();

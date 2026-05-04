@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 /**
  * Maps to: Cinema.SCREENROOM
@@ -24,6 +25,9 @@ public class ScreenRoom {
 
     @Column(name = "r_type", length = 30)
     private ERType rType;
+
+    @Column(name = "base_price", precision = 10, scale = 2)
+    private BigDecimal basePrice;
 
     @Column(name = "r_capacity")
     private Integer rCapacity;

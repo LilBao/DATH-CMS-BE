@@ -24,7 +24,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
            "WHERE o.orderId = :orderId")
     Optional<Order> findByIdWithDetails(@Param("orderId") Integer orderId);
 
-    List<Order> findByCustomerCUserIdOrderByOrderTimeDesc(String cUserId);
+    @Query("SELECT o FROM Order o WHERE o.customer.cUserId = :cUserId ORDER BY o.orderTime DESC")
+    List<Order> findByCustomerCUserIdOrderByOrderTimeDesc(@Param("cUserId") String cUserId);
 
     List<Order> findByOrderStatus(EOrderStatus status);
 

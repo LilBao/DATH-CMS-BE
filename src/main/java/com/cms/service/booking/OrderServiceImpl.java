@@ -46,7 +46,6 @@ public class OrderServiceImpl implements OrderService {
     private final CouponRepository couponRepository;
     private final ShowtimeRepository showtimeRepository;
     private final SeatRepository seatRepository;
-    private final PaymentService paymentService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -109,7 +108,12 @@ public class OrderServiceImpl implements OrderService {
                 Seat seat = seatRepository.findById(seatId)
                         .orElseThrow(() -> AppException.notFound("Ghế không tồn tại.", seatId));
                 
-                BigDecimal p = tr.getTPrice() != null ? tr.getTPrice() : BigDecimal.ZERO;
+                BigDecimal p = tr.getTPrice();
+                if (p == null) {
+                    BigDecimal base = seat.getScreenRoom().getBasePrice() != null ? seat.getScreenRoom().getBasePrice() : BigDecimal.ZERO;
+                    BigDecimal surcharge = seat.getSPrice() != null ? seat.getSPrice() : BigDecimal.ZERO;
+                    p = base.add(surcharge);
+                }
                 originalTotal = originalTotal.add(p);
                 
                 Ticket t = Ticket.builder()

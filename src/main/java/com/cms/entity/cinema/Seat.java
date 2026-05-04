@@ -2,10 +2,11 @@ package com.cms.entity.cinema;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 
 /**
  * Maps to: Cinema.SEAT
- * SType: 0 = Standard, 1 = VIP, 2 = COUPLE
+ * SType: 1 = Standard, 2 = VIP, 3 = COUPLE
  * SStatus: false = unavailable, true = available
  */
 @Entity
@@ -25,6 +26,9 @@ public class Seat {
      */
     @Column(name = "s_type", nullable = false)
     private Integer sType;
+
+    @Column(name = "s_price", precision = 10, scale = 2)
+    private BigDecimal sPrice;
 
     /**
      * true = ghế đang hoạt động, false = không sử dụng

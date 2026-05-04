@@ -1,6 +1,7 @@
 package com.cms.dto.response;
 
 import lombok.*;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -11,5 +12,6 @@ public class ScreenRoomResponse {
     private Integer roomId;
     private String rType;
     private Integer rCapacity;
+    private BigDecimal basePrice;
     private Integer totalSeats;
 }

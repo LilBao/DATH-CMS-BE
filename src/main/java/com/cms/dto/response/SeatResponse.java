@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -16,6 +17,7 @@ public class SeatResponse {
     private Integer sRow;
     private Integer sColumn;
     private Integer sType;
+    private BigDecimal sPrice;
     private Boolean sStatus;
     private Boolean isBooked;
 }

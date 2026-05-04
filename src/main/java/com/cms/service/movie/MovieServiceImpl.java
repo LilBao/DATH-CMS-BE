@@ -31,6 +31,16 @@ public class MovieServiceImpl implements MovieService {
         response.setGenres(movie.getGenres().stream().map(Genre::getGenre).collect(Collectors.toSet()));
         response.setFormats(movie.getFormats().stream().map(Format::getFName).collect(Collectors.toSet()));
         response.setActors(movie.getActors().stream().map(Actor::getFullName).collect(Collectors.toSet()));
+
+        Set<Review> reviews = movie.getReviews();
+        if (reviews != null && !reviews.isEmpty()) {
+            double avg = reviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
+            response.setAvgRating(Math.round(avg * 10.0) / 10.0);
+            response.setReviewCount(reviews.size());
+        } else {
+            response.setAvgRating(0.0);
+            response.setReviewCount(0);
+        }
         return response;
     }
 

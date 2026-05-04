@@ -64,6 +64,7 @@ public class SeatServiceImpl implements SeatService {
         Seat seat = Seat.builder()
                 .id(seatPk)
                 .sType(request.getSType() != null ? request.getSType() : 0)
+                .sPrice(request.getSPrice())
                 .sStatus(request.getSStatus() != null ? request.getSStatus() : true)
                 .screenRoom(room)
                 .build();
@@ -79,6 +80,9 @@ public class SeatServiceImpl implements SeatService {
 
         if (request.getSType() != null) {
             seat.setSType(request.getSType());
+        }
+        if (request.getSPrice() != null) {
+            seat.setSPrice(request.getSPrice());
         }
         if (request.getSStatus() != null) {
             seat.setSStatus(request.getSStatus());

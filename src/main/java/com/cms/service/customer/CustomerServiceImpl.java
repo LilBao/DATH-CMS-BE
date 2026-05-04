@@ -1,6 +1,7 @@
 package com.cms.service.customer;
 
 import com.cms.common.exception.AppException;
+import com.cms.dto.request.UpdateProfileRequest;
 import com.cms.dto.response.CustomerResponse;
 import com.cms.entity.customer.Customer;
 import com.cms.enums.ERank;
@@ -52,6 +53,22 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponse getByEmail(String email) {
         return toResponse(customerRepository.findByEmail(email)
                 .orElseThrow(() -> AppException.notFound("Customer", email)));
+    }
+
+    @Override
+    public CustomerResponse updateProfile(String userId, UpdateProfileRequest request) {
+        Customer customer = customerRepository.findById(userId)
+                .orElseThrow(() -> AppException.notFound("Customer", userId));
+
+        customer.setCName(request.getName());
+        customer.setSex(request.getSex());
+        customer.setBirthday(request.getBirthday());
+        customer.setPhoneNumber(request.getPhoneNumber());
+        if (request.getAvatarUrl() != null && !request.getAvatarUrl().isBlank()) {
+            customer.setAvatarUrl(request.getAvatarUrl());
+        }
+
+        return toResponse(customerRepository.save(customer));
     }
 
     @Override

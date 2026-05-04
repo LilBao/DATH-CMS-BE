@@ -26,4 +26,6 @@ public class MovieResponse {
     private Set<String> genres;
     private Set<String> formats;
     private Set<String> actors;
+    private Double avgRating;
+    private Integer reviewCount;
 }

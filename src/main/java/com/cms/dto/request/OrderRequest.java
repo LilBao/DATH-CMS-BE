@@ -19,7 +19,7 @@ public class OrderRequest {
         private Integer roomId;
         private Integer sRow;
         private Integer sColumn;
-        private BigDecimal tPrice; // Optional if you trust client
+        private BigDecimal tPrice;
     }
     
     @Data

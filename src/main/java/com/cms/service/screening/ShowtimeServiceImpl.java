@@ -46,6 +46,8 @@ public class ShowtimeServiceImpl implements ShowtimeService {
                 response.setBranchName(s.getScreenRoom().getBranch().getBName());
             }
             response.setRoomId(s.getScreenRoom().getId().getRoomId());
+            response.setRType(s.getScreenRoom().getRType());
+            response.setRPrice(s.getScreenRoom().getBasePrice());
         }
         if (s.getFormat() != null) {
             response.setFormatName(s.getFormat().getFName());
