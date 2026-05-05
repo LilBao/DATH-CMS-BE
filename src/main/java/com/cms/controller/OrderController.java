@@ -3,6 +3,7 @@ package com.cms.controller;
 import com.cms.common.response.ApiResponse;
 import com.cms.dto.request.OrderRequest;
 import com.cms.dto.response.OrderResponse;
+import com.cms.enums.EOrderStatus;
 import com.cms.security.CurrentUser;
 import com.cms.service.booking.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,9 +25,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    @Operation(summary = "Lấy danh sách tất cả đơn hàng")
-    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAll() {
-        return ResponseEntity.ok(ApiResponse.ok(orderService.getAll()));
+    @Operation(summary = "Lấy danh sách đơn hàng (có thể lọc theo trạng thái)")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAll(@RequestParam(required = false) EOrderStatus status) {
+        return ResponseEntity.ok(ApiResponse.ok(orderService.getAll(status)));
     }
 
     @GetMapping("/{id}")

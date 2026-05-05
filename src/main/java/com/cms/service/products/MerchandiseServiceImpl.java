@@ -7,6 +7,8 @@ import com.cms.entity.products.Merchandise;
 import com.cms.repository.products.MerchandiseRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("merchandise")
     public List<MerchandiseResponse> getAll() {
         return merchandiseRepository.findAll().stream()
                 .map(m -> modelMapper.map(m, MerchandiseResponse.class))
@@ -31,6 +34,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "merchandise", key = "#id")
     public MerchandiseResponse getById(Integer id) {
         Merchandise merchandise = merchandiseRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Merchandise", id.toString()));
@@ -46,6 +50,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     }
 
     @Override
+    @CacheEvict(value = "merchandise", allEntries = true)
     public MerchandiseResponse create(MerchandiseRequest request) {
         Merchandise merchandise = modelMapper.map(request, Merchandise.class);
         merchandise.setItemType("MERCHANDISE");
@@ -53,6 +58,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     }
 
     @Override
+    @CacheEvict(value = "merchandise", allEntries = true)
     public MerchandiseResponse update(Integer id, MerchandiseRequest request) {
         Merchandise merchandise = merchandiseRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Merchandise", id.toString()));
@@ -62,6 +68,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     }
 
     @Override
+    @CacheEvict(value = "merchandise", allEntries = true)
     public void delete(Integer id) {
         if (!merchandiseRepository.existsById(id)) {
             throw AppException.notFound("Merchandise", id.toString());

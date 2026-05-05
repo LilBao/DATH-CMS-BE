@@ -9,6 +9,8 @@ import com.cms.repository.cinema.BranchRepository;
 import com.cms.repository.staff.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,7 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("branches")
     public List<BranchResponse> getAll() {
         return branchRepository.findAll().stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -58,6 +61,7 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "branches", key = "#id")
     public BranchResponse getById(Integer id) {
         Branch branch = branchRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Branch", id));
@@ -72,6 +76,7 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    @CacheEvict(value = "branches", allEntries = true)
     public BranchResponse create(BranchRequest request) {
         Branch branch = Branch.builder().build();
         applyRequest(branch, request);
@@ -79,6 +84,7 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    @CacheEvict(value = "branches", allEntries = true)
     public BranchResponse update(Integer id, BranchRequest request) {
         Branch branch = branchRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Branch", id));
@@ -87,6 +93,7 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    @CacheEvict(value = "branches", allEntries = true)
     public void delete(Integer id) {
         if (!branchRepository.existsById(id)) {
             throw AppException.notFound("Branch", id);

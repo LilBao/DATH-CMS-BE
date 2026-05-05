@@ -2,7 +2,9 @@ package com.cms.service.booking;
 
 import com.cms.common.exception.AppException;
 import com.cms.dto.request.OrderRequest;
+import com.cms.dto.response.AddonResponse;
 import com.cms.dto.response.OrderResponse;
+import com.cms.dto.response.TicketResponse;
 import com.cms.entity.booking.Coupon;
 import com.cms.entity.booking.Order;
 import com.cms.entity.cinema.Seat;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,13 +52,21 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
 
     @Override
-    public List<OrderResponse> getAll() {
-        return orderRepository.findAll().stream()
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getAll(EOrderStatus status) {
+        List<Order> orders;
+        if (status != null) {
+            orders = orderRepository.findByOrderStatus(status);
+        } else {
+            orders = orderRepository.findAll();
+        }
+        return orders.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getById(String id) {
         Order order = orderRepository.findById(Integer.parseInt(id))
                 .orElseThrow(() -> AppException.notFound("Không tìm thấy Order: ", id));
@@ -63,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getByEmail(String email) {
         Order order = orderRepository.findByCustomerEmail(email)
                 .stream()
@@ -193,6 +205,48 @@ public class OrderServiceImpl implements OrderService {
         if (order.getOrderStatus() != null) {
             response.setOrderStatus(order.getOrderStatus().name());
         }
+
+        if (order.getTickets() != null) {
+            response.setTicketDetails(order.getTickets().stream().map(t -> {
+                TicketResponse tr = new TicketResponse();
+                tr.setTicketId(t.getTicketId());
+                if (t.getShowtime() != null) {
+                    if (t.getShowtime().getMovie() != null) {
+                        tr.setMovieName(t.getShowtime().getMovie().getMName());
+                    }
+                    if (t.getShowtime().getDay() != null && t.getShowtime().getStartTime() != null) {
+                        tr.setShowtime(LocalDateTime.of(t.getShowtime().getDay(), t.getShowtime().getStartTime()));
+                    }
+                    if (t.getShowtime().getScreenRoom() != null) {
+                        tr.setScreenRoomName("Room " + t.getShowtime().getScreenRoom().getId().getRoomId());
+                        if (t.getShowtime().getScreenRoom().getBranch() != null) {
+                            tr.setBranchName(t.getShowtime().getScreenRoom().getBranch().getBName());
+                        }
+                    }
+                }
+                if (t.getSeat() != null && t.getSeat().getId() != null) {
+                    tr.setSeatName(t.getSeat().getId().getSRow() + "-" + t.getSeat().getId().getSColumn());
+                }
+                tr.setPrice(t.getTPrice());
+                return tr;
+            }).collect(Collectors.toList()));
+        }
+
+        if (order.getAddonItems() != null) {
+            response.setAddonDetails(order.getAddonItems().stream().map(a -> {
+                AddonResponse ar = new AddonResponse();
+                ar.setProductId(a.getProductId());
+                ar.setItemType(a.getItemType());
+                ar.setPrice(a.getPrice());
+                if (a instanceof FoodDrink) {
+                    FoodDrink fd = (FoodDrink) a;
+                    ar.setPName(fd.getPName());
+                    ar.setQuantity(fd.getQuantity());
+                }
+                return ar;
+            }).collect(Collectors.toList()));
+        }
+
         return response;
     }
 }

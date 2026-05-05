@@ -10,6 +10,7 @@ public interface MovieService {
     MovieResponse getById(Integer id);
     MovieResponse getBySlug(String slug);
     List<MovieResponse> getNowShowing();
+    List<MovieResponse> getNowShowingAtBranch(Integer branchId);
     List<MovieResponse> getComingSoon();
     List<MovieResponse> searchByName(String name);
     List<MovieResponse> getByGenre(String genre);

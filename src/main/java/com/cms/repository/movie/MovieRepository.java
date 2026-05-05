@@ -20,6 +20,13 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
     @Query("SELECT m FROM Movie m WHERE m.releaseDate > :today")
     List<Movie> findComingSoon(@Param("today") LocalDate today);
 
+    @Query("SELECT DISTINCT s.movie FROM Showtime s " +
+           "WHERE s.screenRoom.id.branchId = :branchId " +
+           "AND s.day >= :today " +
+           "AND s.movie.releaseDate <= :today " +
+           "AND s.movie.closingDate >= :today")
+    List<Movie> findNowShowingAtBranch(@Param("branchId") Integer branchId, @Param("today") LocalDate today);
+
     @Query("SELECT m FROM Movie m JOIN m.genres g WHERE g.genre = :genre")
     List<Movie> findByGenre(@Param("genre") String genre);
 

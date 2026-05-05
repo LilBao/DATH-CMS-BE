@@ -28,11 +28,15 @@ public class ScreenRoomServiceImpl implements ScreenRoomService {
     private final ModelMapper modelMapper;
 
     private ScreenRoomResponse toResponse(ScreenRoom room) {
-        ScreenRoomResponse response = modelMapper.map(room, ScreenRoomResponse.class);
-        response.setBranchId(room.getId().getBranchId());
-        response.setRoomId(room.getId().getRoomId());
-        response.setTotalSeats(room.getSeats() != null ? room.getSeats().size() : 0);
-        return response;
+        if (room == null) return null;
+        return ScreenRoomResponse.builder()
+                .branchId(room.getId().getBranchId())
+                .roomId(room.getId().getRoomId())
+                .rType(room.getRType() != null ? room.getRType().name() : null)
+                .rCapacity(room.getRCapacity())
+                .basePrice(room.getBasePrice())
+                .totalSeats(room.getSeats() != null ? room.getSeats().size() : 0)
+                .build();
     }
 
     @Override
@@ -76,8 +80,13 @@ public class ScreenRoomServiceImpl implements ScreenRoomService {
         ScreenRoomId pk = new ScreenRoomId(branchId, roomId);
         ScreenRoom room = screenRoomRepository.findById(pk)
                 .orElseThrow(() -> AppException.notFound("ScreenRoom", branchId + "/" + roomId));
-        modelMapper.map(request, room);
-        room.setId(pk); // Ensure ID is not overwritten
+        
+        if (request.getRType() != null) {
+            room.setRType(ERType.valueOf(request.getRType()));
+        }
+        room.setRCapacity(request.getRCapacity());
+        room.setBasePrice(request.getBasePrice());
+        
         return toResponse(screenRoomRepository.save(room));
     }
 

@@ -4,9 +4,11 @@ import com.cms.common.response.ApiResponse;
 import com.cms.dto.request.BranchRequest;
 import com.cms.dto.request.ScreenRoomRequest;
 import com.cms.dto.response.BranchResponse;
+import com.cms.dto.response.MovieResponse;
 import com.cms.dto.response.ScreenRoomResponse;
 import com.cms.service.cinema.BranchService;
 import com.cms.service.cinema.ScreenRoomService;
+import com.cms.service.movie.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ public class BranchController {
 
     private final BranchService branchService;
     private final ScreenRoomService screenRoomService;
+    private final MovieService movieService;
 
     @GetMapping
     @Operation(summary = "Lấy danh sách tất cả chi nhánh")
@@ -70,6 +73,12 @@ public class BranchController {
     @Operation(summary = "Lấy danh sách tất cả phòng chiếu của một chi nhánh")
     public ResponseEntity<ApiResponse<List<ScreenRoomResponse>>> getRooms(@PathVariable Integer branchId) {
         return ResponseEntity.ok(ApiResponse.ok(screenRoomService.getByBranch(branchId)));
+    }
+
+    @GetMapping("/{branchId}/now-showing")
+    @Operation(summary = "Lấy danh sách phim đang chiếu tại một chi nhánh cụ thể")
+    public ResponseEntity<ApiResponse<List<MovieResponse>>> getNowShowingAtBranch(@PathVariable Integer branchId) {
+        return ResponseEntity.ok(ApiResponse.ok(movieService.getNowShowingAtBranch(branchId)));
     }
 
     @GetMapping("/{branchId}/rooms/{roomId}")

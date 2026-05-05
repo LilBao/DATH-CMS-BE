@@ -8,6 +8,9 @@ import com.cms.repository.movie.*;
 import com.cms.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +67,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("movies")
     public List<MovieResponse> getAll() {
         return movieRepository.findAll().stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -71,6 +75,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "movies", key = "#id")
     public MovieResponse getById(Integer id) {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Movie", id));
@@ -79,6 +84,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("movies_now_showing")
     public List<MovieResponse> getNowShowing() {
         return movieRepository.findNowShowing(LocalDate.now()).stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -86,6 +92,15 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "movies_now_showing_branch", key = "#branchId")
+    public List<MovieResponse> getNowShowingAtBranch(Integer branchId) {
+        return movieRepository.findNowShowingAtBranch(branchId, LocalDate.now()).stream()
+                .map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable("movies_coming_soon")
     public List<MovieResponse> getComingSoon() {
         return movieRepository.findComingSoon(LocalDate.now()).stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -100,12 +115,14 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "movies_genre", key = "#genre")
     public List<MovieResponse> getByGenre(String genre) {
         return movieRepository.findByGenre(genre).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
+    @Cacheable(value = "movies_slug", key = "#slug")
     public MovieResponse getBySlug(String slug) {
         Movie movie = movieRepository.findBySlug(slug);
         if (movie == null) {
@@ -117,6 +134,14 @@ public class MovieServiceImpl implements MovieService {
     // ── Mutation ───────────────────────────────────────────────
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "movies", allEntries = true),
+            @CacheEvict(value = "movies_now_showing", allEntries = true),
+            @CacheEvict(value = "movies_now_showing_branch", allEntries = true),
+            @CacheEvict(value = "movies_coming_soon", allEntries = true),
+            @CacheEvict(value = "movies_slug", allEntries = true),
+            @CacheEvict(value = "movies_genre", allEntries = true)
+    })
     public MovieResponse create(MovieRequest request) {
         Movie movie = Movie.builder().build();
         applyRequest(movie, request);
@@ -125,6 +150,13 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "movies", allEntries = true),
+            @CacheEvict(value = "movies_now_showing", allEntries = true),
+            @CacheEvict(value = "movies_coming_soon", allEntries = true),
+            @CacheEvict(value = "movies_slug", allEntries = true),
+            @CacheEvict(value = "movies_genre", allEntries = true)
+    })
     public MovieResponse update(Integer id, MovieRequest request) {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Movie", id));
@@ -133,6 +165,13 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "movies", allEntries = true),
+            @CacheEvict(value = "movies_now_showing", allEntries = true),
+            @CacheEvict(value = "movies_coming_soon", allEntries = true),
+            @CacheEvict(value = "movies_slug", allEntries = true),
+            @CacheEvict(value = "movies_genre", allEntries = true)
+    })
     public void delete(Integer id) {
         if (!movieRepository.existsById(id)) {
             throw AppException.notFound("Movie", id);

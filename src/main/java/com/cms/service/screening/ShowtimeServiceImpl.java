@@ -15,6 +15,9 @@ import com.cms.repository.movie.MovieRepository;
 import com.cms.repository.screening.ShowtimeRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +84,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("showtimes")
     public List<ShowtimeResponse> getAll() {
         return showtimeRepository.findAll().stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -88,6 +92,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "showtimes", key = "#id")
     public ShowtimeResponse getById(Integer id) {
         return toResponse(showtimeRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Showtime", id)));
@@ -95,6 +100,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "showtimes_movie_day", key = "#movieId.toString() + '_' + #day.toString()")
     public List<ShowtimeResponse> getByMovieAndDay(Integer movieId, LocalDate day) {
         return showtimeRepository.findByMovieAndDay(movieId, day).stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -102,6 +108,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "showtimes_branch_day", key = "#branchId.toString() + '_' + #day.toString()")
     public List<ShowtimeResponse> getByBranchAndDay(Integer branchId, LocalDate day) {
         return showtimeRepository.findByBranchAndDay(branchId, day).stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -109,12 +116,19 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "showtimes_movie_slug", key = "#slug")
     public List<ShowtimeResponse> getByMovie(String slug) {
         return showtimeRepository.findByMovieMovieSlug(slug).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "showtimes", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_day", allEntries = true),
+            @CacheEvict(value = "showtimes_branch_day", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_slug", allEntries = true)
+    })
     public ShowtimeResponse create(ShowtimeRequest request) {
         // Kiểm tra conflict suất chiếu
         boolean conflict = showtimeRepository
@@ -128,6 +142,12 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "showtimes", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_day", allEntries = true),
+            @CacheEvict(value = "showtimes_branch_day", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_slug", allEntries = true)
+    })
     public ShowtimeResponse update(Integer id, ShowtimeRequest request) {
         Showtime existing = showtimeRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Showtime", id));
@@ -138,6 +158,12 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "showtimes", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_day", allEntries = true),
+            @CacheEvict(value = "showtimes_branch_day", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_slug", allEntries = true)
+    })
     public ShowtimeResponse updateStatus(Integer id, String status) {
         Showtime showtime = showtimeRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Showtime", id));
@@ -150,6 +176,12 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "showtimes", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_day", allEntries = true),
+            @CacheEvict(value = "showtimes_branch_day", allEntries = true),
+            @CacheEvict(value = "showtimes_movie_slug", allEntries = true)
+    })
     public void delete(Integer id) {
         if (!showtimeRepository.existsById(id)) {
             throw AppException.notFound("Showtime", id);

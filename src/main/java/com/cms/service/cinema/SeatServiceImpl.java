@@ -16,6 +16,8 @@ import com.cms.repository.screening.ShowtimeRepository;
 import com.cms.repository.screening.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,12 +47,14 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "seats_by_room", key = "#branchId.toString() + '_' + #roomId.toString()")
     public List<SeatResponse> getByRoom(Integer branchId, Integer roomId) {
         return seatRepository.findByIdBranchIdAndIdRoomId(branchId, roomId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
+    @CacheEvict(value = "seats_by_room", key = "#request.branchId.toString() + '_' + #request.roomId.toString()")
     public SeatResponse create(SeatRequest request) {
         ScreenRoomId roomPk = new ScreenRoomId(request.getBranchId(), request.getRoomId());
         ScreenRoom room = screenRoomRepository.findById(roomPk)
@@ -73,6 +77,7 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    @CacheEvict(value = "seats_by_room", key = "#request.branchId.toString() + '_' + #request.roomId.toString()")
     public SeatResponse update(SeatRequest request) {
         SeatId seatPk = new SeatId(request.getBranchId(), request.getRoomId(), request.getSRow(), request.getSColumn());
         Seat seat = seatRepository.findById(seatPk)
@@ -92,6 +97,7 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    @CacheEvict(value = "seats_by_room", key = "#branchId.toString() + '_' + #roomId.toString()")
     public void delete(Integer branchId, Integer roomId, Integer sRow, Integer sColumn) {
         SeatId seatPk = new SeatId(branchId, roomId, sRow, sColumn);
         if (!seatRepository.existsById(seatPk)) {
@@ -101,6 +107,7 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    @CacheEvict(value = "seats_by_room", allEntries = true)
     public void createBulk(List<SeatRequest> requests) {
         if (requests == null || requests.isEmpty()) return;
         

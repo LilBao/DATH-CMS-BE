@@ -3,6 +3,7 @@ package com.cms.dto.response;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class OrderResponse {
@@ -14,4 +15,6 @@ public class OrderResponse {
     private BigDecimal total;
     private String orderStatus;
     private String paymentUrl;
+    private List<TicketResponse> ticketDetails;
+    private List<AddonResponse> addonDetails;
 }
