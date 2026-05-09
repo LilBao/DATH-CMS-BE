@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.time.LocalDate;
 import java.util.List;
 
-@Document(indexName = "movies")
+@Document(indexName = "movies", createIndex = false)
 @Data
 @Builder
 @NoArgsConstructor

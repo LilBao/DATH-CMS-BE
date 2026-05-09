@@ -1,5 +1,6 @@
 package com.cms.repository.screening;
 
+import com.cms.dto.response.OccupancyResponse;
 import com.cms.entity.screening.Showtime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,4 +36,9 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, Integer> {
 
     boolean existsByScreenRoomIdBranchIdAndScreenRoomIdRoomIdAndDayAndStartTime(
             Integer branchId, Integer roomId, LocalDate day, java.time.LocalTime startTime);
+
+    @Query("SELECT new com.cms.dto.response.OccupancyResponse(s.timeId, m.mName, b.bName, sr.id.roomId, s.day, s.startTime, sr.rCapacity, SIZE(s.tickets)) " +
+           "FROM Showtime s JOIN s.movie m JOIN s.screenRoom sr JOIN sr.branch b " +
+           "WHERE s.day BETWEEN :startDate AND :endDate")
+    List<OccupancyResponse> getOccupancyRates(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

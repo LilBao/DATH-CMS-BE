@@ -107,4 +107,39 @@ public class EmailServiceImpl implements EmailService {
             log.error("Failed to send ticket email to {}", to, e);
         }
     }
+    @Override
+    @Async
+    @Transactional(readOnly = true)
+    public void sendReminderEmail(String to, Integer orderId) {
+        try {
+            Order order = orderRepository.findByIdWithDetails(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Order not found for reminder: " + orderId));
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            
+            Ticket firstTicket = order.getTickets().get(0);
+            String movieName = firstTicket.getShowtime().getMovie().getMName();
+            helper.setSubject("Nhắc lịch xem phim: " + movieName + " - CMS Cinema");
+
+            Context context = new Context();
+            context.setVariable("order", order);
+            context.setVariable("movieName", movieName);
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+            context.setVariable("startTime", firstTicket.getShowtime().getStartTime().format(formatter));
+            context.setVariable("branchName", firstTicket.getSeat().getScreenRoom().getBranch().getBName());
+
+            String html = templateEngine.process("reminder-email", context);
+            helper.setText(html, true);
+
+            mailSender.send(message);
+            log.info("Reminder email sent successfully to {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send reminder email to {}", to, e);
+        }
+    }
 }

@@ -5,6 +5,7 @@ import com.cms.dto.request.MovieRequest;
 import com.cms.dto.response.MovieResponse;
 import com.cms.entity.movie.*;
 import com.cms.repository.movie.*;
+import com.cms.service.search.SearchService;
 import com.cms.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,6 +29,7 @@ public class MovieServiceImpl implements MovieService {
     private final FormatRepository formatRepository;
     private final ActorRepository actorRepository;
     private final ModelMapper modelMapper;
+    private final SearchService searchService;
 
     private MovieResponse toResponse(Movie movie) {
         MovieResponse response = modelMapper.map(movie, MovieResponse.class);
@@ -131,8 +133,6 @@ public class MovieServiceImpl implements MovieService {
         return toResponse(movie);
     }
 
-    // ── Mutation ───────────────────────────────────────────────
-
     @Override
     @Caching(evict = {
             @CacheEvict(value = "movies", allEntries = true),
@@ -146,7 +146,9 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = Movie.builder().build();
         applyRequest(movie, request);
         movie.setSlug(CommonUtil.generateUniqueSlug(movie.getMName()));
-        return toResponse(movieRepository.save(movie));
+        Movie savedMovie = movieRepository.save(movie);
+        searchService.syncMovie(savedMovie.getMovieId());
+        return toResponse(savedMovie);
     }
 
     @Override
@@ -161,7 +163,9 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Movie", id));
         applyRequest(movie, request);
-        return toResponse(movieRepository.save(movie));
+        Movie updatedMovie = movieRepository.save(movie);
+        searchService.syncMovie(updatedMovie.getMovieId());
+        return toResponse(updatedMovie);
     }
 
     @Override
@@ -177,5 +181,6 @@ public class MovieServiceImpl implements MovieService {
             throw AppException.notFound("Movie", id);
         }
         movieRepository.deleteById(id);
+        searchService.deleteMovie(id);
     }
 }

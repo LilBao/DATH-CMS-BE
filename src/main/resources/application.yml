@@ -52,6 +52,10 @@ spring:
           min-idle: 2
           max-wait: 1000ms
       timeout: 2000ms
+    elasticsearch:
+      uris: ${ELASTICSEARCH_URL:http://localhost:9200}
+      socket-timeout: 30s
+      connection-timeout: 10s
 
   security:
     oauth2:
@@ -119,3 +123,7 @@ logging:
     com.cms: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

@@ -74,7 +74,8 @@ public class SecurityConfig {
                                 API_V1 + "/food-drinks/**", 
                                 API_V1 + "/merchandise/**",
                                 API_V1 + "/coupons/**",
-                                API_V1 + "/catalog/**").permitAll()
+                                API_V1 + "/catalog/**",
+                                API_V1 + "/search/**").permitAll()
 
                         // ===== Files =====
                         .requestMatchers(API_V1 + "/files/**").hasAnyRole("STAFF", "MANAGER", "ADMIN")
@@ -99,7 +100,7 @@ public class SecurityConfig {
 
                         // ===== Admin only =====
                         // Quản lý nhân sự
-                        .requestMatchers(API_V1 + "/employees/**").hasRole("ADMIN")
+                        .requestMatchers(API_V1 + "/employees/**", API_V1 + "/search/sync").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
