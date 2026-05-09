@@ -113,6 +113,10 @@ public class OrderServiceImpl implements OrderService {
         List<Ticket> tickets = new ArrayList<>();
         if (request.getTickets() != null) {
             for (OrderRequest.TicketRequest tr : request.getTickets()) {
+                if (tr.getBranchId() == null && employee != null && employee.getBranch() != null) {
+                    tr.setBranchId(employee.getBranch().getBranchId());
+                }
+
                 Showtime showtime = showtimeRepository.findById(tr.getShowtimeId())
                         .orElseThrow(() -> AppException.notFound("Không tìm thấy suất chiếu.", tr.getShowtimeId()));
                 

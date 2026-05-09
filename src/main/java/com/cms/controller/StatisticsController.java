@@ -32,32 +32,46 @@ public class StatisticsController {
     @GetMapping("/revenue/daily")
     @Operation(summary = "Thống kê doanh thu theo ngày")
     public ResponseEntity<ApiResponse<List<DailyRevenueResponse>>> getDailyRevenue(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        if (startDate == null) startDate = LocalDate.now().minusDays(30);
+        if (endDate == null) endDate = LocalDate.now();
         return ResponseEntity.ok(ApiResponse.ok(statisticsService.getDailyRevenue(startDate, endDate)));
     }
 
     @GetMapping("/revenue/movie")
     @Operation(summary = "Thống kê doanh thu theo phim")
     public ResponseEntity<ApiResponse<List<MovieRevenueResponse>>> getMovieRevenue(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            // THÊM required = false VÀO ĐÂY
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        if (startDate == null) startDate = LocalDate.now().minusDays(30);
+        if (endDate == null) endDate = LocalDate.now();
         return ResponseEntity.ok(ApiResponse.ok(statisticsService.getMovieRevenue(startDate, endDate)));
     }
 
     @GetMapping("/revenue/branch")
     @Operation(summary = "Thống kê doanh thu theo chi nhánh")
     public ResponseEntity<ApiResponse<List<BranchRevenueResponse>>> getBranchRevenue(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            // THÊM required = false VÀO ĐÂY
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        if (startDate == null) startDate = LocalDate.now().minusDays(30);
+        if (endDate == null) endDate = LocalDate.now();
         return ResponseEntity.ok(ApiResponse.ok(statisticsService.getBranchRevenue(startDate, endDate)));
     }
 
     @GetMapping("/occupancy")
     @Operation(summary = "Thống kê tỷ lệ lấp đầy phòng chiếu")
     public ResponseEntity<ApiResponse<List<OccupancyResponse>>> getOccupancyRates(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        if (startDate == null) startDate = LocalDate.now().minusDays(30);
+        if (endDate == null) endDate = LocalDate.now();
         return ResponseEntity.ok(ApiResponse.ok(statisticsService.getOccupancyRates(startDate, endDate)));
     }
 }

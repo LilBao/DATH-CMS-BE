@@ -14,10 +14,12 @@ import com.cms.repository.cinema.ScreenRoomRepository;
 import com.cms.repository.cinema.SeatRepository;
 import com.cms.repository.screening.ShowtimeRepository;
 import com.cms.repository.screening.TicketRepository;
+import com.cms.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,19 @@ public class SeatServiceImpl implements SeatService {
         return response;
     }
 
+    /**
+     * BẢO MẬT: Kiểm tra xem user hiện tại (nếu là Manager)
+     * có quyền thao tác trên chi nhánh này hay không.
+     */
+    private void checkBranchAccess(Integer targetBranchId) {
+        if (SecurityUtil.isManager()) {
+            Integer managerBranchId = SecurityUtil.getCurrentBranchId();
+            if (managerBranchId == null || !managerBranchId.equals(targetBranchId)) {
+                throw new AppException(HttpStatus.BAD_REQUEST, "Bạn không có quyền thao tác trên phòng chiếu của chi nhánh khác");
+            }
+        }
+    }
+
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "seats_by_room", key = "#branchId.toString() + '_' + #roomId.toString()")
@@ -56,6 +71,9 @@ public class SeatServiceImpl implements SeatService {
     @Override
     @CacheEvict(value = "seats_by_room", key = "#request.branchId.toString() + '_' + #request.roomId.toString()")
     public SeatResponse create(SeatRequest request) {
+        // Kiểm tra quyền
+        checkBranchAccess(request.getBranchId());
+
         ScreenRoomId roomPk = new ScreenRoomId(request.getBranchId(), request.getRoomId());
         ScreenRoom room = screenRoomRepository.findById(roomPk)
                 .orElseThrow(() -> AppException.notFound("ScreenRoom", request.getBranchId() + "/" + request.getRoomId()));
@@ -79,6 +97,9 @@ public class SeatServiceImpl implements SeatService {
     @Override
     @CacheEvict(value = "seats_by_room", key = "#request.branchId.toString() + '_' + #request.roomId.toString()")
     public SeatResponse update(SeatRequest request) {
+        // Kiểm tra quyền
+        checkBranchAccess(request.getBranchId());
+
         SeatId seatPk = new SeatId(request.getBranchId(), request.getRoomId(), request.getSRow(), request.getSColumn());
         Seat seat = seatRepository.findById(seatPk)
                 .orElseThrow(() -> AppException.notFound("Seat", "Row " + request.getSRow() + ", Col " + request.getSColumn()));
@@ -99,6 +120,9 @@ public class SeatServiceImpl implements SeatService {
     @Override
     @CacheEvict(value = "seats_by_room", key = "#branchId.toString() + '_' + #roomId.toString()")
     public void delete(Integer branchId, Integer roomId, Integer sRow, Integer sColumn) {
+        // Kiểm tra quyền
+        checkBranchAccess(branchId);
+
         SeatId seatPk = new SeatId(branchId, roomId, sRow, sColumn);
         if (!seatRepository.existsById(seatPk)) {
             throw AppException.notFound("Seat", "Row " + sRow + ", Col " + sColumn);
@@ -110,14 +134,28 @@ public class SeatServiceImpl implements SeatService {
     @CacheEvict(value = "seats_by_room", allEntries = true)
     public void createBulk(List<SeatRequest> requests) {
         if (requests == null || requests.isEmpty()) return;
-        
+
+        // Kiểm tra quyền truy cập chi nhánh 1 lần cho toàn bộ request
+        checkBranchAccess(requests.get(0).getBranchId());
+
         for (SeatRequest request : requests) {
-            try {
+            SeatId seatPk = new SeatId(
+                    request.getBranchId(),
+                    request.getRoomId(),
+                    request.getSRow(),
+                    request.getSColumn()
+            );
+
+            // Cơ chế UPSERT: Có rồi thì Update, chưa có thì Create
+            if (seatRepository.existsById(seatPk)) {
+                // Tùy chọn 1: Cập nhật lại thông tin ghế nếu ghế đã tồn tại
+                update(request);
+
+                // Tùy chọn 2 (Nếu không muốn cập nhật, chỉ muốn bỏ qua ghế trùng thì dùng dòng dưới thay cho update):
+                // continue;
+            } else {
+                // Chưa tồn tại -> Tạo mới
                 create(request);
-            } catch (Exception e) {
-                // For bulk, maybe we want to continue or throw. 
-                // Let's just let it throw for now to be safe, or log it.
-                throw e;
             }
         }
     }

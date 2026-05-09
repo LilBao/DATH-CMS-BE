@@ -39,7 +39,6 @@ public class BranchServiceImpl implements BranchService {
 
     private void applyRequest(Branch branch, BranchRequest request) {
         modelMapper.map(request, branch);
-        branch.setBranchId(null);
         if (request.getManagerId() != null) {
             Employee manager = employeeRepository.findById(request.getManagerId())
                     .orElseThrow(() -> AppException.notFound("Employee", request.getManagerId()));

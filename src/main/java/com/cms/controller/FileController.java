@@ -24,20 +24,38 @@ public class FileController {
     @Operation(summary = "Upload tệp", description = "Tải lên một hoặc nhiều tệp tin (hình ảnh, tài liệu) vào một thư mục cụ thể.")
     @PostMapping("/upload")
     public ApiResponse<?> uploadFiles(
-            @RequestParam("files") List<MultipartFile> files,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            @RequestParam(value = "file", required = false) List<MultipartFile> singleFile,
             @RequestParam String folderName) {
 
-        List<Map> results = fileService.uploadFiles(files, folderName);
+        List<MultipartFile> allFiles = new java.util.ArrayList<>();
+        if (files != null) allFiles.addAll(files);
+        if (singleFile != null) allFiles.addAll(singleFile);
+
+        if (allFiles.isEmpty()) {
+            return ApiResponse.error(500, "Required part 'files' or 'file' is not present.");
+        }
+
+        List<Map> results = fileService.uploadFiles(allFiles, folderName);
         return ApiResponse.ok("Upload files success", results);
     }
 
     @Operation(summary = "Upload video", description = "Tải lên một hoặc nhiều tệp video vào một thư mục cụ thể.")
     @PostMapping("/upload-video")
     public ApiResponse<?> uploadVideos(
-            @RequestParam("files") List<MultipartFile> files,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            @RequestParam(value = "file", required = false) List<MultipartFile> singleFile,
             @RequestParam String folderName) {
 
-        List<Map> results = fileService.uploadVideos(files, folderName);
+        List<MultipartFile> allFiles = new java.util.ArrayList<>();
+        if (files != null) allFiles.addAll(files);
+        if (singleFile != null) allFiles.addAll(singleFile);
+
+        if (allFiles.isEmpty()) {
+            return ApiResponse.error(500, "Required part 'files' or 'file' is not present.");
+        }
+
+        List<Map> results = fileService.uploadVideos(allFiles, folderName);
         return ApiResponse.ok("Upload videos success", results);
     }
 }

@@ -12,6 +12,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +31,8 @@ public class MovieServiceImpl implements MovieService {
     private final FormatRepository formatRepository;
     private final ActorRepository actorRepository;
     private final ModelMapper modelMapper;
-    private final SearchService searchService;
+//    TODO
+//    private final SearchService searchService;
 
     private MovieResponse toResponse(Movie movie) {
         MovieResponse response = modelMapper.map(movie, MovieResponse.class);
@@ -51,8 +54,6 @@ public class MovieServiceImpl implements MovieService {
 
     private void applyRequest(Movie movie, MovieRequest request) {
         modelMapper.map(request, movie);
-        movie.setMovieId(null); // Ensure ID is not overwritten from request if it exists
-
         if (request.getGenreIds() != null) {
             Set<Genre> genres = new HashSet<>(genreRepository.findAllById(request.getGenreIds()));
             movie.setGenres(genres);
@@ -147,7 +148,7 @@ public class MovieServiceImpl implements MovieService {
         applyRequest(movie, request);
         movie.setSlug(CommonUtil.generateUniqueSlug(movie.getMName()));
         Movie savedMovie = movieRepository.save(movie);
-        searchService.syncMovie(savedMovie.getMovieId());
+        //searchService.syncMovie(savedMovie.getMovieId());
         return toResponse(savedMovie);
     }
 
@@ -164,7 +165,7 @@ public class MovieServiceImpl implements MovieService {
                 .orElseThrow(() -> AppException.notFound("Movie", id));
         applyRequest(movie, request);
         Movie updatedMovie = movieRepository.save(movie);
-        searchService.syncMovie(updatedMovie.getMovieId());
+        //searchService.syncMovie(updatedMovie.getMovieId());
         return toResponse(updatedMovie);
     }
 
@@ -180,7 +181,15 @@ public class MovieServiceImpl implements MovieService {
         if (!movieRepository.existsById(id)) {
             throw AppException.notFound("Movie", id);
         }
-        movieRepository.deleteById(id);
-        searchService.deleteMovie(id);
+
+        try {
+            movieRepository.deleteById(id);
+            // Ép Hibernate thực thi câu lệnh SQL ngay lập tức để bắt lỗi ForeignKey
+            movieRepository.flush();
+//            searchService.deleteMovie(id);
+        } catch (DataIntegrityViolationException e) {
+            // Ném lỗi về Controller để GlobalExceptionHandler xử lý thành phản hồi 400 Bad Request
+            throw new AppException(HttpStatus.BAD_REQUEST,"", "Không thể xóa phim này vì đã có suất chiếu được xếp lịch.");
+        }
     }
 }

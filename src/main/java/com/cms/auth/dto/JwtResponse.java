@@ -24,4 +24,5 @@ public class JwtResponse {
     private String fullName;
     private String role;
     private String avatarUrl;
+    private Integer branchId;
 }

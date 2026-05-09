@@ -9,6 +9,7 @@ import com.cms.entity.cinema.ScreenRoomId;
 import com.cms.enums.ERType;
 import com.cms.repository.cinema.BranchRepository;
 import com.cms.repository.cinema.ScreenRoomRepository;
+import com.cms.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,13 @@ public class ScreenRoomServiceImpl implements ScreenRoomService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ScreenRoomResponse> getAll() {
+        return screenRoomRepository.findAll().stream()
+                .map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ScreenRoomResponse> getByBranch(Integer branchId) {
         return screenRoomRepository.findByIdBranchId(branchId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -57,6 +65,15 @@ public class ScreenRoomServiceImpl implements ScreenRoomService {
 
     @Override
     public ScreenRoomResponse create(ScreenRoomRequest request) {
+        // Auto-fill branchId for Managers
+        if (request.getBranchId() == null && SecurityUtil.isManager()) {
+            request.setBranchId(SecurityUtil.getCurrentBranchId());
+        }
+
+        if (request.getBranchId() == null) {
+            throw AppException.badRequest("Branch ID is required");
+        }
+
         Branch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> AppException.notFound("Branch", request.getBranchId()));
         ScreenRoomId pk = new ScreenRoomId(request.getBranchId(), request.getRoomId());

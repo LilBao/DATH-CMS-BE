@@ -1,5 +1,6 @@
 package com.cms.entity.movie;
 
+import com.cms.entity.screening.Showtime;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -111,4 +112,9 @@ public class Movie {
     @Builder.Default
     @ToString.Exclude
     private Set<Review> reviews = new HashSet<>();
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    @ToString.Exclude
+    private Set<Showtime> showtimes = new HashSet<>();
 }

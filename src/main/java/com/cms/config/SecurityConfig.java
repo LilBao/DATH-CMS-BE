@@ -98,9 +98,11 @@ public class SecurityConfig {
                         // ===== Customer Profile & Management =====
                         .requestMatchers(API_V1 + "/customers/**").hasAnyRole("MEMBER", "MANAGER", "ADMIN")
 
-                        // ===== Admin only =====
-                        // Quản lý nhân sự
-                        .requestMatchers(API_V1 + "/employees/**", API_V1 + "/search/sync").hasRole("ADMIN")
+                        // Cho phép cả MANAGER và ADMIN quản lý nhân sự
+                        .requestMatchers(API_V1 + "/employees/**").hasAnyRole("ADMIN", "MANAGER")
+
+                        // Sync Search chỉ dành cho ADMIN
+                        .requestMatchers(API_V1 + "/search/sync").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

@@ -22,7 +22,7 @@ public class SeatController {
 
     private final SeatService seatService;
 
-    @GetMapping("branches/{branchId}/rooms/{roomId}")
+    @GetMapping("/branches/{branchId}/rooms/{roomId}")
     @Operation(summary = "Lấy danh sách ghế của một phòng chiếu")
     public ResponseEntity<ApiResponse<List<SeatResponse>>> getSeats(
             @PathVariable Integer branchId,
@@ -30,7 +30,7 @@ public class SeatController {
         return ResponseEntity.ok(ApiResponse.ok(seatService.getByRoom(branchId, roomId)));
     }
 
-    @PostMapping
+    @PostMapping("/branches/{branchId}/rooms/{roomId}")
     @Operation(summary = "Tạo mới một ghế")
     public ResponseEntity<ApiResponse<SeatResponse>> createSeat(
             @PathVariable Integer branchId,
@@ -42,7 +42,7 @@ public class SeatController {
                 .body(ApiResponse.created(seatService.create(request)));
     }
 
-    @PostMapping("/bulk")
+    @PostMapping("/branches/{branchId}/rooms/{roomId}/bulk")
     @Operation(summary = "Tạo nhiều ghế cùng lúc")
     public ResponseEntity<ApiResponse<String>> createSeatsBulk(
             @PathVariable Integer branchId,
@@ -57,7 +57,7 @@ public class SeatController {
                 .body(ApiResponse.created("Bulk seats created successfully"));
     }
 
-    @PutMapping("/{sRow}/{sColumn}")
+    @PutMapping("/branches/{branchId}/rooms/{roomId}/row/{sRow}/col/{sColumn}")
     @Operation(summary = "Cập nhật thông tin ghế")
     public ResponseEntity<ApiResponse<SeatResponse>> updateSeat(
             @PathVariable Integer branchId,
@@ -72,7 +72,7 @@ public class SeatController {
         return ResponseEntity.ok(ApiResponse.ok("Updated successfully", seatService.update(request)));
     }
 
-    @DeleteMapping("/{sRow}/{sColumn}")
+    @DeleteMapping("/branches/{branchId}/rooms/{roomId}/row/{sRow}/col/{sColumn}")
     @Operation(summary = "Xóa một ghế")
     public ResponseEntity<ApiResponse<Void>> deleteSeat(
             @PathVariable Integer branchId,

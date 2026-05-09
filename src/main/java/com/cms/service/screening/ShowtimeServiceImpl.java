@@ -13,6 +13,7 @@ import com.cms.repository.cinema.ScreenRoomRepository;
 import com.cms.repository.movie.FormatRepository;
 import com.cms.repository.movie.MovieRepository;
 import com.cms.repository.screening.ShowtimeRepository;
+import com.cms.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -130,6 +131,15 @@ public class ShowtimeServiceImpl implements ShowtimeService {
             @CacheEvict(value = "showtimes_movie_slug", allEntries = true)
     })
     public ShowtimeResponse create(ShowtimeRequest request) {
+        // Auto-fill branchId for Managers
+        if (request.getBranchId() == null && SecurityUtil.isManager()) {
+            request.setBranchId(SecurityUtil.getCurrentBranchId());
+        }
+
+        if (request.getBranchId() == null) {
+            throw AppException.badRequest("Branch ID is required");
+        }
+
         // Kiểm tra conflict suất chiếu
         boolean conflict = showtimeRepository
                 .existsByScreenRoomIdBranchIdAndScreenRoomIdRoomIdAndDayAndStartTime(
@@ -151,6 +161,16 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     public ShowtimeResponse update(Integer id, ShowtimeRequest request) {
         Showtime existing = showtimeRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Showtime", id));
+
+        // Auto-fill branchId for Managers
+        if (request.getBranchId() == null && SecurityUtil.isManager()) {
+            request.setBranchId(SecurityUtil.getCurrentBranchId());
+        }
+
+        if (request.getBranchId() == null) {
+            request.setBranchId(existing.getScreenRoom().getId().getBranchId());
+        }
+
         Showtime updated = buildFromRequest(request);
         updated.setTimeId(id);
         updated.setStatus(existing.getStatus());

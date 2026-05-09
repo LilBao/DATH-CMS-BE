@@ -3,6 +3,7 @@ package com.cms.auth.strategy;
 import com.cms.auth.dto.JwtResponse;
 import com.cms.auth.dto.LoginRequest;
 import com.cms.common.enums.AuthProviderType;
+import com.cms.common.enums.UserType;
 import com.cms.common.exception.AppException;
 import com.cms.entity.customer.Customer;
 import com.cms.entity.staff.Employee;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +54,7 @@ public class LocalAuthStrategy implements AuthStrategy {
     }
 
     @Override
+    @Transactional
     public JwtResponse authenticate(LoginRequest request) {
         log.debug("LOCAL auth for email: {}", request.getEmail());
 
@@ -113,6 +116,14 @@ public class LocalAuthStrategy implements AuthStrategy {
         }
 
         Map<String, Object> claims = buildClaims(employee.getEUserId(), employee.getUserType().name());
+
+        // Add branchId for Managers
+        Integer branchId = null;
+        if (employee.getUserType() == UserType.MANAGER && employee.getBranch() != null) {
+            branchId = employee.getBranch().getBranchId();
+            claims.put("branchId", branchId);
+        }
+
         String accessToken = jwtTokenProvider.generateAccessToken(employee.getEmail(), claims);
         String refreshToken = jwtTokenProvider.generateRefreshToken(employee.getEmail());
 
@@ -126,6 +137,7 @@ public class LocalAuthStrategy implements AuthStrategy {
                 .email(employee.getEmail())
                 .fullName(employee.getEName())
                 .role(employee.getUserType().name())
+                .branchId(branchId)
                 .build();
     }
 

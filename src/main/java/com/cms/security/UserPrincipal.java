@@ -29,6 +29,7 @@ public class UserPrincipal implements UserDetails {
     private final Integer point;
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean isActive;
+    private final Integer branchId; // For staff members
 
     // ── Static factory methods ──────────────────────────────────
 
@@ -69,6 +70,7 @@ public class UserPrincipal implements UserDetails {
                 .birthday(employee.getBirthday())
                 .authorities(authorities)
                 .isActive(employee.isActive())
+                .branchId(employee.getBranch() != null ? employee.getBranch().getBranchId() : null)
                 .build();
     }
 

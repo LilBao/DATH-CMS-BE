@@ -2,17 +2,20 @@ package com.cms.controller;
 
 import com.cms.common.response.ApiResponse;
 import com.cms.dto.request.EmployeeRequest;
+import com.cms.dto.request.WorkShiftRequest;
 import com.cms.dto.response.EmployeeResponse;
 import com.cms.service.staff.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -69,5 +72,26 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         employeeService.delete(id);
         return ResponseEntity.ok(ApiResponse.ok("Employee deleted successfully", null));
+    }
+
+    @PutMapping("/{id}/work-shifts")
+    @Operation(summary = "Phân ca làm việc cho nhân viên")
+    public ResponseEntity<ApiResponse<Void>> assignWorkShifts(
+            @PathVariable String id,
+            @RequestBody List<WorkShiftRequest> requests) {
+        employeeService.assignWorkShifts(id, requests);
+        return ResponseEntity.ok(ApiResponse.ok("Phân ca thành công", null));
+    }
+
+    @DeleteMapping("/{id}/work-shifts")
+    @Operation(summary = "Gỡ 1 ca làm việc của 1 nhân viên cụ thể")
+    public ResponseEntity<ApiResponse<Void>> unassignWorkShift(
+            @PathVariable String id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
+            @RequestParam Integer wDate) {
+
+        employeeService.unassignWorkShift(id, startTime, endTime, wDate);
+        return ResponseEntity.ok(ApiResponse.ok("Gỡ ca làm việc thành công", null));
     }
 }

@@ -40,7 +40,6 @@ public class EmployeeRequest {
     @NotNull(message = "User type is required")
     private UserType userType;
 
-    @NotNull(message = "Branch ID is required")
     private Integer branchId;
 
     private String managerId;
