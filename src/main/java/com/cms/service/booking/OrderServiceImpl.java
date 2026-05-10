@@ -3,6 +3,7 @@ package com.cms.service.booking;
 import com.cms.common.exception.AppException;
 import com.cms.dto.request.OrderRequest;
 import com.cms.dto.response.AddonResponse;
+import com.cms.dto.response.CustomerResponse;
 import com.cms.dto.response.OrderResponse;
 import com.cms.dto.response.TicketResponse;
 import com.cms.entity.booking.Coupon;
@@ -23,7 +24,6 @@ import com.cms.repository.cinema.SeatRepository;
 import com.cms.repository.customer.CustomerRepository;
 import com.cms.repository.screening.ShowtimeRepository;
 import com.cms.repository.staff.EmployeeRepository;
-import com.cms.service.payment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,13 +53,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderResponse> getAll(EOrderStatus status) {
-        List<Order> orders;
-        if (status != null) {
-            orders = orderRepository.findByOrderStatus(status);
-        } else {
-            orders = orderRepository.findAll();
-        }
+    public List<OrderResponse> getAll(EOrderStatus status, Integer branchId) {
+        List<Order> orders = orderRepository.findAllByStatusAndBranch(status, branchId);
         return orders.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -68,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public OrderResponse getById(String id) {
-        Order order = orderRepository.findById(Integer.parseInt(id))
+        Order order = orderRepository.findByIdWithDetails(Integer.parseInt(id))
                 .orElseThrow(() -> AppException.notFound("Không tìm thấy Order: ", id));
         return mapToResponse(order);
     }
@@ -76,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public OrderResponse getByEmail(String email) {
-        Order order = orderRepository.findByCustomerEmail(email)
+        Order order = orderRepository.findByCustomerEmailWithCustomer(email)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> AppException.notFound("Không tìm thấy Order cho email: ", email));
@@ -99,7 +94,14 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = new Order();
-        if (customer != null) {
+        if (request.getCustomerId() != null) {
+            Customer targetedCustomer = customerRepository.findById(request.getCustomerId())
+                    .orElseThrow(() -> AppException.notFound("Customer", request.getCustomerId()));
+            order.setCustomer(targetedCustomer);
+            if (employee != null) {
+                order.setEmployee(employee);
+            }
+        } else if (customer != null) {
             order.setCustomer(customer);
         } else {
             order.setEmployee(employee);
@@ -204,6 +206,28 @@ public class OrderServiceImpl implements OrderService {
         return mapToResponse(savedOrder);
     }
 
+    @Override
+    @Transactional
+    public OrderResponse updateStatus(String id, EOrderStatus status) {
+        Order order = orderRepository.findById(Integer.parseInt(id))
+                .orElseThrow(() -> AppException.notFound("Không tìm thấy Order: ", id));
+        order.setOrderStatus(status);
+        return mapToResponse(orderRepository.save(order));
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse update(String id, OrderRequest request) {
+        Order order = orderRepository.findById(Integer.parseInt(id))
+                .orElseThrow(() -> AppException.notFound("Không tìm thấy Order: ", id));
+        
+        if (request.getPaymentMethod() != null) {
+            order.setPaymentMethod(request.getPaymentMethod());
+        }
+        
+        return mapToResponse(orderRepository.save(order));
+    }
+
     private OrderResponse mapToResponse(Order order) {
         OrderResponse response = modelMapper.map(order, OrderResponse.class);
         if (order.getOrderStatus() != null) {
@@ -251,6 +275,20 @@ public class OrderServiceImpl implements OrderService {
             }).collect(Collectors.toList()));
         }
 
+        if (order.getCustomer() != null) {
+            response.setCustomer(mapCustomerToResponse(order.getCustomer()));
+        }
+
+        return response;
+    }
+
+    private CustomerResponse mapCustomerToResponse(Customer c) {
+        if (c == null) return null;
+        CustomerResponse response = modelMapper.map(c, CustomerResponse.class);
+        if (c.getMembership() != null) {
+            response.setMembershipTier(c.getMembership().getMemberRank().name());
+            response.setTotalPoints(c.getMembership().getPoint());
+        }
         return response;
     }
 }

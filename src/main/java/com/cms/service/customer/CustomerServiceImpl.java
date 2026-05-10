@@ -31,6 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
             response.setMembershipTier((rank.getLabel() >= 1 && rank.getLabel() <= 4) ? rank.name() : "UNKNOWN");
             response.setTotalPoints(c.getMembership().getPoint());
         }
+        response.setAvatarUrl(c.getAvatarUrl());
         return response;
     }
 
@@ -53,6 +54,13 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponse getByEmail(String email) {
         return toResponse(customerRepository.findByEmail(email)
                 .orElseThrow(() -> AppException.notFound("Customer", email)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomerResponse getByPhone(String phone) {
+        return toResponse(customerRepository.findByPhoneNumber(phone)
+                .orElseThrow(() -> AppException.notFound("Customer phone: ", phone)));
     }
 
     @Override

@@ -85,7 +85,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable("showtimes")
     public List<ShowtimeResponse> getAll() {
         return showtimeRepository.findAll().stream()
                 .map(this::toResponse).collect(Collectors.toList());
@@ -117,10 +116,11 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "showtimes_movie_slug", key = "#slug")
     public List<ShowtimeResponse> getByMovie(String slug) {
-        return showtimeRepository.findByMovieMovieSlug(slug).stream()
-                .map(this::toResponse).collect(Collectors.toList());
+        LocalDate today = LocalDate.now();
+        return showtimeRepository.findByMovieMovieSlug(slug, today).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

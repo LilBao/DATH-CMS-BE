@@ -43,4 +43,6 @@ public class EmployeeRequest {
     private Integer branchId;
 
     private String managerId;
+
+    private String avatarUrl;
 }

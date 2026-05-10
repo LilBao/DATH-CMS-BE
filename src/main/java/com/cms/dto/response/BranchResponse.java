@@ -16,4 +16,5 @@ public class BranchResponse {
     private String managerId;
     private List<String> phoneNumbers;
     private Integer totalRooms;
+    private Boolean isActive;
 }

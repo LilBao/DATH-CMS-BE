@@ -30,6 +30,10 @@ public class Branch {
     @Column(name = "b_address", length = 200)
     private String bAddress;
 
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
+
     /**
      * Quản lý chi nhánh
      */

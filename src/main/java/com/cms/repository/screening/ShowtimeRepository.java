@@ -12,8 +12,12 @@ import java.util.List;
 
 @Repository
 public interface ShowtimeRepository extends JpaRepository<Showtime, Integer> {
-    @Query("SELECT s FROM Showtime s WHERE s.movie.slug = :slug")
-    List<Showtime> findByMovieMovieSlug(String slug);
+    
+    void deleteByDayBefore(LocalDate date);
+
+    @Query("SELECT s FROM Showtime s WHERE s.movie.slug = :slug " +
+           "AND s.day >= :today")
+    List<Showtime> findByMovieMovieSlug(@Param("slug") String slug, @Param("today") LocalDate today);
 
     List<Showtime> findByDayBetween(LocalDate from, LocalDate to);
 
@@ -39,6 +43,10 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, Integer> {
 
     @Query("SELECT new com.cms.dto.response.OccupancyResponse(s.timeId, m.mName, b.bName, sr.id.roomId, s.day, s.startTime, sr.rCapacity, SIZE(s.tickets)) " +
            "FROM Showtime s JOIN s.movie m JOIN s.screenRoom sr JOIN sr.branch b " +
-           "WHERE s.day BETWEEN :startDate AND :endDate")
-    List<OccupancyResponse> getOccupancyRates(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+           "WHERE (s.day BETWEEN :startDate AND :endDate) " +
+           "AND (:branchId IS NULL OR sr.id.branchId = :branchId)")
+    List<OccupancyResponse> getOccupancyRates(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("branchId") Integer branchId);
 }

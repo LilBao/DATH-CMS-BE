@@ -15,6 +15,7 @@ public class OrderResponse {
     private BigDecimal total;
     private String orderStatus;
     private String paymentUrl;
+    private CustomerResponse customer;
     private List<TicketResponse> ticketDetails;
     private List<AddonResponse> addonDetails;
 }

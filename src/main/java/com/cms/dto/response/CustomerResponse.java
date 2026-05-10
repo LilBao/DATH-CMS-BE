@@ -1,6 +1,7 @@
 package com.cms.dto.response;
 
 import com.cms.common.enums.UserType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ public class CustomerResponse {
     private UserType userType;
     private String authProvider;
     private String avatarUrl;
+    @JsonProperty("isActive")
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

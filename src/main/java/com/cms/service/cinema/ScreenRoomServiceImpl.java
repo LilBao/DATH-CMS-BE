@@ -83,7 +83,7 @@ public class ScreenRoomServiceImpl implements ScreenRoomService {
         }
         ScreenRoom room = ScreenRoom.builder()
                 .id(pk)
-                .rType(ERType.valueOf(request.getRType()))
+                .rType(ERType.fromLabel(request.getRType()))
                 .rCapacity(request.getRCapacity())
                 .basePrice(request.getBasePrice())
                 .branch(branch)
@@ -99,7 +99,7 @@ public class ScreenRoomServiceImpl implements ScreenRoomService {
                 .orElseThrow(() -> AppException.notFound("ScreenRoom", branchId + "/" + roomId));
         
         if (request.getRType() != null) {
-            room.setRType(ERType.valueOf(request.getRType()));
+            room.setRType(ERType.fromLabel(request.getRType()));
         }
         room.setRCapacity(request.getRCapacity());
         room.setBasePrice(request.getBasePrice());

@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 
 public interface OrderService {
-    List<OrderResponse> getAll(EOrderStatus status);
+    List<OrderResponse> getAll(EOrderStatus status, Integer branchId);
     OrderResponse getById(String id);
     OrderResponse getByEmail(String email);
     OrderResponse createOrder(UserDetails userDetails, OrderRequest request);
+    OrderResponse updateStatus(String id, EOrderStatus status);
+    OrderResponse update(String id, OrderRequest request);
 }

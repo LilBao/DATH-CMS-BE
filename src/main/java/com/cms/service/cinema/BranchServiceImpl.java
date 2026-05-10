@@ -48,6 +48,11 @@ public class BranchServiceImpl implements BranchService {
         }
         branch.setPhoneNumbers(request.getPhoneNumbers() != null
                 ? request.getPhoneNumbers() : new ArrayList<>());
+        if (request.getIsActive() != null) {
+            branch.setIsActive(request.getIsActive());
+        } else if (branch.getIsActive() == null) {
+            branch.setIsActive(true);
+        }
     }
 
     @Override

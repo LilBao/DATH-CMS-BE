@@ -23,4 +23,5 @@ public class BranchRequest {
     private String managerId;
 
     private List<String> phoneNumbers;
+    private Boolean isActive;
 }

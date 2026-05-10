@@ -10,4 +10,5 @@ import java.util.List;
 public interface BranchRepository extends JpaRepository<Branch, Integer> {
 
     List<Branch> findByBNameContainingIgnoreCase(String name);
+    List<Branch> findByIsActiveTrue();
 }

@@ -1,5 +1,6 @@
 package com.cms.controller;
 
+import com.cms.auth.dto.RegisterRequest;
 import com.cms.common.response.ApiResponse;
 import com.cms.dto.request.UpdateProfileRequest;
 import com.cms.dto.response.CustomerResponse;
@@ -24,6 +25,16 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final com.cms.auth.service.AuthService authService;
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(summary = "Tạo mới khách hàng (Dành cho Admin/Staff)")
+    public ResponseEntity<ApiResponse<CustomerResponse>> create(@Valid @RequestBody RegisterRequest request) {
+        // Reuse register logic but for internal use
+        com.cms.auth.dto.JwtResponse response = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.ok("Customer created successfully", customerService.getById(response.getUserId())));
+    }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
@@ -59,6 +70,13 @@ public class CustomerController {
     @Operation(summary = "Lấy thông tin khách hàng theo email")
     public ResponseEntity<ApiResponse<CustomerResponse>> getByEmail(@RequestParam String email) {
         return ResponseEntity.ok(ApiResponse.ok(customerService.getByEmail(email)));
+    }
+
+    @GetMapping("/phone")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(summary = "Lấy thông tin khách hàng theo số điện thoại")
+    public ResponseEntity<ApiResponse<CustomerResponse>> getByPhone(@RequestParam String phone) {
+        return ResponseEntity.ok(ApiResponse.ok(customerService.getByPhone(phone)));
     }
 
     @PatchMapping("/{id}/deactivate")

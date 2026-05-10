@@ -45,6 +45,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             response.setManagerId(e.getManager().getEUserId());
             response.setManagerName(e.getManager().getEName());
         }
+        response.setAvatarUrl(e.getAvatarUrl());
         return response;
     }
 
@@ -108,6 +109,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setActive(true);
         employee.setSubordinates(new HashSet<>());
         employee.setWorkShifts(new HashSet<>());
+        if (request.getAvatarUrl() != null) {
+            employee.setAvatarUrl(request.getAvatarUrl());
+        }
 
         return toResponse(employeeRepository.save(employee));
     }
@@ -154,6 +158,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setBranch(targetBranch);
         employee.setManager(manager);
 
+        if (request.getAvatarUrl() != null && !request.getAvatarUrl().isBlank()) {
+            employee.setAvatarUrl(request.getAvatarUrl());
+        }
+
         return toResponse(employeeRepository.save(employee));
     }
 
@@ -162,6 +170,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> AppException.notFound("Employee", id));
         employee.setActive(false);
+        employeeRepository.save(employee);
+    }
+
+    @Override
+    public void activate(String id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> AppException.notFound("Employee", id));
+        employee.setActive(true);
         employeeRepository.save(employee);
     }
 

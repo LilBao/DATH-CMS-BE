@@ -117,9 +117,10 @@ public class LocalAuthStrategy implements AuthStrategy {
 
         Map<String, Object> claims = buildClaims(employee.getEUserId(), employee.getUserType().name());
 
-        // Add branchId for Managers
+        // Add branchId for Employees (Manager or Staff)
         Integer branchId = null;
-        if (employee.getUserType() == UserType.MANAGER && employee.getBranch() != null) {
+        if ((employee.getUserType() == UserType.MANAGER || employee.getUserType() == UserType.STAFF) 
+            && employee.getBranch() != null) {
             branchId = employee.getBranch().getBranchId();
             claims.put("branchId", branchId);
         }
@@ -138,6 +139,7 @@ public class LocalAuthStrategy implements AuthStrategy {
                 .fullName(employee.getEName())
                 .role(employee.getUserType().name())
                 .branchId(branchId)
+                .avatarUrl(employee.getAvatarUrl())
                 .build();
     }
 

@@ -67,6 +67,13 @@ public class EmployeeController {
         return ResponseEntity.ok(ApiResponse.ok("Employee deactivated", null));
     }
 
+    @PatchMapping("/{id}/activate")
+    @Operation(summary = "Kích hoạt tài khoản nhân viên")
+    public ResponseEntity<ApiResponse<Void>> activate(@PathVariable String id) {
+        employeeService.activate(id);
+        return ResponseEntity.ok(ApiResponse.ok("Employee activated", null));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Xóa thông tin nhân viên")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {

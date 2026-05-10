@@ -9,6 +9,7 @@ public interface CustomerService {
     List<CustomerResponse> getAll();
     CustomerResponse getById(String id);
     CustomerResponse getByEmail(String email);
+    CustomerResponse getByPhone(String phone);
     CustomerResponse updateProfile(String userId, UpdateProfileRequest request);
     void deactivate(String id);
     void activate(String id);

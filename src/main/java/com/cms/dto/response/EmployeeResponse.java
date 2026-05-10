@@ -1,6 +1,7 @@
 package com.cms.dto.response;
 
 import com.cms.common.enums.UserType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -18,11 +19,13 @@ public class EmployeeResponse {
     private String email;
     private BigDecimal salary;
     private UserType userType;
+    @JsonProperty("isActive")
     private boolean isActive;
     private Integer branchId;
     private String branchName;
     private String managerId;
     private String managerName;
+    private String avatarUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

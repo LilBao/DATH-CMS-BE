@@ -62,7 +62,7 @@ public class Order {
      * Khách hàng đặt vé online
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "c_user_id", nullable = false)
+    @JoinColumn(name = "c_user_id", nullable = true)
     private Customer customer;
 
     /**

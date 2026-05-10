@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 public class OrderRequest {
     private String paymentMethod;
     private Integer couponId;
+    private String customerId;
+    private String orderStatus;
     
     private List<TicketRequest> tickets;
     private List<AddonItemRequest> addons;

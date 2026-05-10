@@ -11,4 +11,10 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, ReviewId> {
     List<Review> findByMovieMovieId(Integer movieId);
     List<Review> findByMovieSlug(String slug);
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(r) FROM Review r")
+    Long countTotalReviews();
+
+    @org.springframework.data.jpa.repository.Query("SELECT AVG(r.rating) FROM Review r")
+    Double getAverageRating();
 }

@@ -58,6 +58,7 @@ public class SeatController {
     }
 
     @PutMapping("/branches/{branchId}/rooms/{roomId}/row/{sRow}/col/{sColumn}")
+
     @Operation(summary = "Cập nhật thông tin ghế")
     public ResponseEntity<ApiResponse<SeatResponse>> updateSeat(
             @PathVariable Integer branchId,
