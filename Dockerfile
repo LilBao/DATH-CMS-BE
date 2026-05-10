@@ -1,38 +1,32 @@
-# =========================================
-# Stage 1: Build
-# =========================================
+
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Copy pom.xml first for dependency caching
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copy source and build
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
-# =========================================
-# Stage 2: Runtime
-# =========================================
+
 FROM eclipse-temurin:17-jre-jammy
 
-LABEL maintainer="CGV Cinema Team"
+LABEL maintainer="cms Cinema Team"
 LABEL version="1.0.0"
 
 WORKDIR /app
 
 # Create non-root user for security
-RUN groupadd -r cgv && useradd -r -g cgv cgv
+RUN groupadd -r cms && useradd -r -g cms cms
 
 # Copy JAR from builder
 COPY --from=builder /app/target/*.jar app.jar
 
 # Set ownership
-RUN chown cgv:cgv app.jar
+RUN chown cms:cms app.jar
 
-USER cgv
+USER cms
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \

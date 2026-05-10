@@ -1,0 +1,46 @@
+package com.cms.entity.cinema;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.math.BigDecimal;
+
+/**
+ * Maps to: Cinema.SEAT
+ * SType: 1 = Standard, 2 = VIP, 3 = COUPLE
+ * SStatus: false = unavailable, true = available
+ */
+@Entity
+@Table(name = "seat")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class Seat {
+
+    @EmbeddedId
+    private SeatId id;
+
+    /**
+     * 1: STANDARD, 2: VIP, 3: SWEETBOX
+     */
+    @Column(name = "s_type", nullable = false)
+    private Integer sType;
+
+    @Column(name = "s_price", precision = 10, scale = 2)
+    private BigDecimal sPrice;
+
+    /**
+     * true = ghế đang hoạt động, false = không sử dụng
+     */
+    @Column(name = "s_status", nullable = false)
+    @Builder.Default
+    private Boolean sStatus = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "branch_id", referencedColumnName = "branch_id", insertable = false, updatable = false),
+            @JoinColumn(name = "room_id", referencedColumnName = "room_id", insertable = false, updatable = false)
+    })
+    private ScreenRoom screenRoom;
+}

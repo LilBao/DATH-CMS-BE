@@ -1,10 +1,12 @@
-# CGV Cinema Backend
+# cms Cinema Backend
 
 ## Stack
-- Java 17 + Spring Boot 3.4.3
+- Java 17 + Spring Boot 4.0.4
 - MySQL 8.0
 - Redis 7.2
 - JWT (JJWT 0.12.6)
+- Elastic Bean Search
+- Cloudinary
 - Docker + Docker Compose
 
 ## Run with Docker
@@ -24,6 +26,7 @@ http://localhost:8080/api
 | POST   | /auth/logout   | Đăng xuất             |
 | GET    | /auth/me       | Thông tin user        |
 
+Sử dụng @CurrentUser truyền vào param method của API để lấy user hiện tại
 ## Login Examples
 
 ### Local Login
@@ -44,3 +47,6 @@ POST /api/auth/login
   "provider": "GOOGLE"
 }
 ```
+
+Flow backend
+Controller -> Interface -> Service -> Repository

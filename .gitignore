@@ -18,8 +18,10 @@ spring.log
 # Environment & secrets
 .env
 *.env
+application.yml
 application-*.yml
 application-*.properties
+src/main/resources/
 
 # OS files
 .DS_Store
@@ -33,3 +35,6 @@ Thumbs.db
 # Test reports
 test-output/
 surefire-reports/
+.mvn/
+ mvnw
+ mvnw.cmd
