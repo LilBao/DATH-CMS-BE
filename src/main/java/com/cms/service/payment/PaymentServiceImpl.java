@@ -8,6 +8,7 @@ import com.cms.entity.booking.Order;
 import com.cms.entity.booking.Payment;
 import com.cms.entity.booking.PaymentHistory;
 import com.cms.entity.customer.Membership;
+import com.cms.enums.ERank;
 import com.cms.enums.EOrderStatus;
 import com.cms.enums.EPaymentMethod;
 import com.cms.enums.EPaymentStatus;
@@ -129,7 +130,15 @@ public class PaymentServiceImpl implements PaymentService {
                             if (pOrder.getCustomer() != null && pOrder.getCustomer().getMembership() != null) {
                                 Membership membership = pOrder.getCustomer().getMembership();
                                 int earnedPoints = payment.getAmount().divide(new BigDecimal(1000)).intValue();
-                                membership.setPoint(membership.getPoint() + earnedPoints);
+                                int newTotal = membership.getPoint() + earnedPoints;
+                                membership.setPoint(newTotal);
+                                ERank newRank = computeRank(newTotal);
+                                if (newRank != membership.getMemberRank()) {
+                                    log.info("Customer {} rank upgraded: {} -> {} (points: {})",
+                                            pOrder.getCustomer().getCUserId(),
+                                            membership.getMemberRank(), newRank, newTotal);
+                                    membership.setMemberRank(newRank);
+                                }
                             }
                             orderRepository.save(pOrder);
                             
@@ -204,5 +213,19 @@ public class PaymentServiceImpl implements PaymentService {
                 .filter(s -> s.supports(method))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported payment method: " + method));
+    }
+
+    /**
+     * Xác định hạng thành viên dựa trên tổng điểm tích lũy.
+     *   BRONZE  : 0       – 999   điểm
+     *   SILVER  : 1 000   – 4 999 điểm
+     *   GOLD    : 5 000   – 9 999 điểm
+     *   DIAMOND : 10 000+ điểm
+     */
+    private ERank computeRank(int totalPoints) {
+        if (totalPoints >= 10_000) return ERank.DIAMOND;
+        if (totalPoints >= 5_000)  return ERank.GOLD;
+        if (totalPoints >= 1_000)  return ERank.SILVER;
+        return ERank.BRONZE;
     }
 }
