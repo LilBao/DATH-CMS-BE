@@ -37,14 +37,15 @@ public class SecurityConfig {
 
     private static final String API_V1 = "/api/v1";
 
-    // ── Public Endpoints (no auth needed) ───────────────────────
+    // Public Endpoints (no auth needed)
     private static final String[] PUBLIC_ENDPOINTS = {
             API_V1 + "/auth/**",
             "/actuator/health",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             API_V1 + "/payments/ipn",
-            API_V1 + "/payments/subscribe"
+            API_V1 + "/payments/subscribe",
+            "/ws/**"           // WebSocket handshake (SockJS)
     };
 
     @Bean
